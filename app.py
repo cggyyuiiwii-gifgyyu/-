@@ -5,19 +5,25 @@ import requests
 from flask import Flask, render_template_string, request, jsonify
 from PIL import Image, ImageDraw, ImageFont
 from telethon import TelegramClient, events
-from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButtonWebView
+from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButtonWebView, KeyboardButton
 
 API_ID = int(os.environ.get('API_ID', 1234567))
 API_HASH = os.environ.get('API_HASH', 'your_api_hash')
 BOT_TOKEN = os.environ.get('BOT_TOKEN', 'your_bot_token')
 MINI_APP_URL = "https://daring-encouragement-production-3257.up.railway.app"
-DEV_ID = 5126968608  # معرف الآي دي الخاص بك للمطور
+DEV_ID = 5126968608  # معرف المطور الأساسي
 
 app = Flask(__name__)
 TEMP_DIR = 'temp_badges'
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 client = TelegramClient('bot_session', API_ID, API_HASH)
+
+# تتبع بسيط للإحصائيات
+stats_data = {
+    'total_packs': 0,
+    'active_users': set()
+}
 
 @app.route('/')
 def index():
@@ -27,7 +33,6 @@ def index():
         return render_template_string(html_content)
     return "<h1>الملف index.html غير موجود!</h1>", 404
 
-# API لإنشاء حزمة جديدة أو إضافة ملصقات متعددة لنفس الحزمة بنجاح
 @app.route('/api/create-pack', methods=['POST'])
 def api_create_pack():
     data = request.json
@@ -35,7 +40,7 @@ def api_create_pack():
     color = data.get('color', '#FFFFFF')
     raw_title = data.get('pack_name', 'VIP Status Pack')
     user_id = data.get('user_id', DEV_ID)
-    action_type = data.get('action_type', 'new') # new لإنشاء حزمة جديدة، add لإضافة ملصق لحزمة موجودة
+    action_type = data.get('action_type', 'new')
     target_pack = data.get('target_pack', '')
 
     clean_title = re.sub(r'[^a-zA-Z0-9]', '', raw_title).lower()
@@ -44,7 +49,7 @@ def api_create_pack():
         
     safe_name = target_pack if (action_type == 'add' and target_pack) else f"{clean_title}_{user_id}_by_bot"
     
-    # مقاس أيقونة الحالة الدقيق في تليجرام 100x100 بكسل بخلفية شفافة
+    # مقاس أيقونة الحالة الدقيق في تليجرام 100x100 بكسل بخلفية شفافة تماماً
     size = (100, 100)
     image = Image.new("RGBA", size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -67,11 +72,13 @@ def api_create_pack():
     file_path = os.path.join(TEMP_DIR, f"{safe_name}_{os.urandom(2).hex()}.png")
     image.save(file_path, "PNG", optimize=True)
     
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+        return jsonify({'status': 'error', 'error': 'فشل حفظ ملف الصورة محلياً'})
+
     if action_type == 'add':
-        # إضافة ملصق جديد لحزمة موجودة مسبقاً
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/addStickerToSet"
         with open(file_path, 'rb') as sticker_file:
-            files = {'png_sticker': sticker_file}
+            files = {'png_sticker': (os.path.basename(file_path), sticker_file, 'image/png')}
             payload = {
                 'user_id': user_id,
                 'name': safe_name,
@@ -80,10 +87,9 @@ def api_create_pack():
             response = requests.post(url, data=payload, files=files)
             res_json = response.json()
     else:
-        # إنشاء حزمة ملصقات جديدة كلياً
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/createNewStickerSet"
         with open(file_path, 'rb') as sticker_file:
-            files = {'png_sticker': sticker_file}
+            files = {'png_sticker': (os.path.basename(file_path), sticker_file, 'image/png')}
             payload = {
                 'user_id': user_id,
                 'name': safe_name,
@@ -94,14 +100,16 @@ def api_create_pack():
             response = requests.post(url, data=payload, files=files)
             res_json = response.json()
             
-            # لو الاسم مستخدم من قبل، ننشئ اسماً بديلاً تلقائياً
             if not res_json.get('ok'):
                 safe_name = f"pack{user_id}{os.urandom(3).hex()}bybot"
                 payload['name'] = safe_name
-                response = requests.post(url, data=payload, files=files)
-                res_json = response.json()
+                with open(file_path, 'rb') as retry_file:
+                    retry_files = {'png_sticker': (os.path.basename(file_path), retry_file, 'image/png')}
+                    response = requests.post(url, data=payload, files=retry_files)
+                    res_json = response.json()
     
     if res_json.get('ok'):
+        stats_data['total_packs'] += 1
         pack_link = f"https://t.me/addstickers/{safe_name}"
         return jsonify({'status': 'success', 'pack_link': pack_link, 'pack_name': safe_name})
     else:
@@ -111,31 +119,51 @@ def api_create_pack():
 async def start(event):
     sender = await event.get_sender()
     user_id = sender.id
+    stats_data['active_users'].add(user_id)
     
+    # زر شفاف احترافي لفتح التطبيق المصغر للمستخدمين
     button_webapp = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
-    keyboard = ReplyInlineMarkup(rows=[KeyboardButtonRow(buttons=[button_webapp])])
+    rows = [KeyboardButtonRow(buttons=[button_webapp])]
     
-    welcome_text = "✨ أهلاً بك يا غالي في استوديو الأيقونات والحزم الشفافة بدقة 100x100!\nاضغط على الزر أدناه لفتح التطبيق وتصميم وإدارة حزمك بكل أريحية:"
-    
-    # لو المستخدم هو المطور الأساسي (بالآي دي والمعرف المحدد)
+    # لو كان المستخدم هو المطور الأساسي، نضيف زر لوحة التحكم الخاصة به
     if user_id == DEV_ID:
-        welcome_text += "\n\n🛠 **مرحباً بك يا مطورنا الأساسي!** يمكنك إرسال كلمة `لوحة المطور` للوصول للتحكم الإداري."
+        rows.append(KeyboardButtonRow(buttons=[KeyboardButton(text="⚙️ لوحة تحكم الأدمن")]))
         
-    await event.respond(welcome_text, buttons=keyboard)
+    keyboard = ReplyInlineMarkup(rows=rows)
+    await event.respond(
+        "✨ أهلاً بك يا غالي في استوديو الأيقونات والحزم الشفافة بدقة 100x100!\n"
+        "اضغط على الزر أدناه لفتح التطبيق وتصميم وتصدير حزمك مباشرة لتليجرام:", 
+        buttons=keyboard
+    )
 
-@client.on(events.NewMessage(pattern='لوحة المطور'))
+@client.on(events.NewMessage(pattern='⚙️ لوحة تحكم الأدمن'))
 async def dev_panel(event):
     if event.sender_id != DEV_ID:
         return
     
     panel_text = (
-        "🛠 **لوحة تحكم المشرف (المطور الأساسي):**\n\n"
-        "• معرف المطور (ID): `5126968608`\n"
-        "• حالة السيرفر والنظام: `يعمل بكفاءة تامة 100%`\n"
-        "• ميزة إضافة عدة ملصقات للحزمة: `مفعلة ونشطة`\n\n"
-        "الخيارات الإدارية متاحة للتحكم الكامل بالمستخدمين والحزم."
+        "🛠 **لوحة تحكم الأدمن المركزية (المطور):**\n\n"
+        f"• معرف المطور (ID): `{DEV_ID}`\n"
+        f"• إجمالي الحزم المصنوعة: `{stats_data['total_packs']}`\n"
+        f"• المستخدمين النشطين: `{len(stats_data['active_users'])}`\n"
+        "• حالة النظام: `يعمل بكفاءة وسلاسة تامة 100%`"
     )
-    await event.respond(panel_text)
+    
+    # أزرار لوحة تحكم المطور النظيفة
+    keyboard = ReplyInlineMarkup(rows=[
+        KeyboardButtonRow(buttons=[KeyboardButton(text="📊 تحديث الإحصائيات"), KeyboardButton(text="🔙 العودة للرئيسية")])
+    ])
+    await event.respond(panel_text, buttons=keyboard)
+
+@client.on(events.NewMessage(pattern='📊 تحديث الإحصائيات'))
+async def refresh_stats(event):
+    if event.sender_id != DEV_ID:
+        return
+    await dev_panel(event)
+
+@client.on(events.NewMessage(pattern='🔙 العودة للرئيسية'))
+async def back_home(event):
+    await start(event)
 
 async def main():
     await client.start(bot_token=BOT_TOKEN)
