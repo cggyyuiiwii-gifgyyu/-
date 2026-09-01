@@ -91,52 +91,24 @@ def api_create_pack():
 
 @client.on(events.NewMessage(pattern='/start'))
 async def start(event):
-    sender = await event.get_sender()
-    user_id = sender.id
-    
+    # زر التطبيق المصغر فقط لتجنب أي تعارض في الأزرار
     button_webapp = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
-    rows = [KeyboardButtonRow(buttons=[button_webapp])]
+    keyboard = ReplyInlineMarkup(rows=[KeyboardButtonRow(buttons=[button_webapp])])
     
-    if user_id == DEV_ID:
-        from telethon.tl.types import KeyboardButton
-        rows.append(KeyboardButtonRow(buttons=[KeyboardButton(text="⚙️ لوحة تحكم المطور")]))
-        
-    keyboard = ReplyInlineMarkup(rows=rows)
     await event.respond(
-        "✨ أهلاً بك يا غالي في استوديو الأيقونات المميزة!\nاختر من الأدناه لفتح التطبيق المصغر وتصميم حزمة ملصقاتك الشفافة بدقة 100x100:", 
+        "✨ أهلاً بك يا غالي في استوديو الأيقونات المميزة!\nاضغط على الزر أدناه لفتح التطبيق وتصميم حزمة ملصقاتك الشفافة بدقة 100x100:", 
         buttons=keyboard
     )
 
-@client.on(events.NewMessage(pattern='⚙️ لوحة تحكم المطور'))
+@client.on(events.NewMessage(pattern='لوحة المطور'))
 async def dev_panel(event):
     if event.sender_id != DEV_ID:
         return
-    
-    text = (
-        "🛠 **أهلاً بك يا مطورنا في لوحة التحكم المركزية:**\n\n"
-        "• حالة البوت: `يعمل بكفاءة على Railway`\n"
-        "• إصدار السيرفر: `Flask + Telethon`\n\n"
-        "اختر العملية المطلوبة:"
-    )
-    from telethon.tl.types import KeyboardButton
-    keyboard = ReplyInlineMarkup(rows=[
-        KeyboardButtonRow(buttons=[KeyboardButton(text="📊 إحصائيات البوت"), KeyboardButton(text="🔙 العودة للرئيسية")])
-    ])
-    await event.respond(text, buttons=keyboard)
-
-@client.on(events.NewMessage(pattern='📊 إحصائيات البوت'))
-async def bot_stats(event):
-    if event.sender_id != DEV_ID:
-        return
-    await event.respond("📊 **إحصائيات النظام:**\n- الحالة: نشط ويعمل 100%\n- الرفع: مرتبط بـ Telegram Bot API مباشرة")
-
-@client.on(events.NewMessage(pattern='🔙 العودة للرئيسية'))
-async def back_home(event):
-    await start(event)
+    await event.respond("🛠 **أهلاً بك يا مطورنا في لوحة التحكم المركزية:**\n- الحالة: النظام يعمل بكفاءة تامة على ريلواي 🚀")
 
 async def main():
     await client.start(bot_token=BOT_TOKEN)
-    print("🤖 بوت أيقونات الحالة المميزة ولوحة تحكم المطور يعملان بكفاءة تامة...")
+    print("🤖 بوت أيقونات الحالة المميزة يعمل بكفاءة تامة...")
     await client.run_until_disconnected()
 
 if __name__ == '__main__':
