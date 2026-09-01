@@ -1,121 +1,402 @@
-import os
-import asyncio
-from flask import Flask, render_template_string, request, jsonify
-from PIL import Image, ImageDraw, ImageFont
-from telethon import TelegramClient, events
-from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButtonWebView
-
-API_ID = int(os.environ.get('API_ID', 1234567))
-API_HASH = os.environ.get('API_HASH', 'your_api_hash')
-BOT_TOKEN = os.environ.get('BOT_TOKEN', 'your_bot_token')
-MINI_APP_URL = "https://daring-encouragement-production-3257.up.railway.app"
-DEV_ID = 5126968608
-
-app = Flask(__name__)
-TEMP_DIR = 'temp_badges'
-os.makedirs(TEMP_DIR, exist_ok=True)
-
-client = TelegramClient('bot_session', API_ID, API_HASH)
-
-stats_data = {
-    'total_packs': 0,
-    'active_users': set()
-}
-
-@app.route('/')
-def index():
-    if os.path.exists('index.html'):
-        with open('index.html', 'r', encoding='utf-8') as f:
-            html_content = f.read()
-        return render_template_string(html_content)
-    return "<h1>الملف index.html غير موجود! تأكد من رفعه للمشروع.</h1>", 404
-
-@app.route('/api/create-pack', methods=['POST'])
-def api_create_pack():
-    try:
-        data = request.json or {}
-        text = data.get('text', '👑')
-        color = data.get('color', '#FFFFFF')
-        raw_title = data.get('pack_name', 'VIP Status Pack')
-        user_id = data.get('user_id', DEV_ID)
-
-        size = (100, 100)
-        image = Image.new("RGBA", size, (0, 0, 0, 0))
-        draw = ImageDraw.Draw(image)
-        
-        try:
-            font = ImageFont.truetype("arialbd.ttf", 55)
-        except:
-            font = ImageFont.load_default()
-            
-        bbox = draw.textbbox((0, 0), text, font=font)
-        w = bbox[2] - bbox[0]
-        h = bbox[3] - bbox[1]
-        
-        x = (size[0] - w) / 2
-        y = (size[1] - h) / 2
-        
-        draw.text((x + 2, y + 2), text, font=font, fill=(0, 0, 0, 200))
-        draw.text((x, y), text, font=font, fill=color)
-        
-        temp_file_name = f"sticker_{user_id}_{os.urandom(3).hex()}.png"
-        file_path = os.path.join(TEMP_DIR, temp_file_name)
-        image.save(file_path, "PNG", optimize=True)
-        
-        if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
-            return jsonify({'status': 'error', 'error': 'فشل حفظ ملف الصورة محلياً'})
-
-        stats_data['total_packs'] += 1
-        
-        return jsonify({
-            'status': 'success', 
-            'pack_link': "https://t.me/Stickers", 
-            'pack_name': raw_title
-        })
-    except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)})
-
-@client.on(events.NewMessage(pattern='/start'))
-async def start(event):
-    sender = await event.get_sender()
-    user_id = sender.id
-    stats_data['active_users'].add(user_id)
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram Hub — Direct Realtime Experience</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- مكتبة Supabase للاتصال وقاعدة البيانات الحية -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    button_webapp = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
-    keyboard = ReplyInlineMarkup(rows=[KeyboardButtonRow(buttons=[button_webapp])])
+    <style>
+        :root {
+            --ios-bg: rgba(242, 242, 247, 0.92);
+            --ios-card: rgba(255, 255, 255, 0.94);
+            --ios-text: #000000;
+            --ios-text-secondary: #3C3C43;
+            --ios-text-tertiary: #8E8E93;
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-purple: #AF52DE;
+            --ios-separator: rgba(60, 60, 67, 0.12);
+            --ios-glass: rgba(255, 255, 255, 0.8);
+            --ios-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --ios-card-radius: 24px;
+            --ios-pill-radius: 50px;
+        }
+
+        [data-theme="dark"] {
+            --ios-bg: rgba(18, 18, 20, 0.96);
+            --ios-card: rgba(30, 30, 34, 0.94);
+            --ios-text: #FFFFFF;
+            --ios-text-secondary: #EBEBF5;
+            --ios-text-tertiary: #98989F;
+            --ios-blue: #0A84FF;
+            --ios-green: #30D158;
+            --ios-purple: #BF5AF2;
+            --ios-separator: rgba(255, 255, 255, 0.15);
+            --ios-glass: rgba(24, 24, 28, 0.8);
+            --ios-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background: transparent;
+            color: var(--ios-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .iphone-container {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            max-height: 896px;
+            background-color: var(--ios-bg);
+            backdrop-filter: blur(25px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 450px) {
+            .iphone-container {
+                border-radius: 50px;
+                border: 12px solid rgba(44, 44, 46, 0.85);
+                height: 880px;
+            }
+        }
+
+        .app-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding-top: 15px;
+            padding-bottom: 90px;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scale(0.96);
+        }
+
+        .app-screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        .nav-bar {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--ios-glass);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 0.5px solid var(--ios-separator);
+        }
+
+        .nav-title { font-size: 20px; font-weight: 800; }
+
+        .ios-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: var(--ios-pill-radius);
+            font-weight: 600;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+        .ios-btn:active { transform: scale(0.94); }
+        .btn-primary { background: var(--ios-blue); color: #FFF; box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
+        .btn-green { background: var(--ios-green); color: #FFF; box-shadow: 0 5px 15px rgba(52,199,89,0.3); }
+        .btn-icon { width: 40px; height: 40px; border-radius: 50%; padding: 0; background: var(--ios-card); color: var(--ios-text); border: 0.5px solid var(--ios-separator); }
+
+        .content-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+        .hub-card {
+            background: var(--ios-card);
+            border-radius: var(--ios-card-radius);
+            padding: 20px;
+            border: 0.5px solid var(--ios-separator);
+            box-shadow: var(--ios-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(128,128,128,0.1);
+            border-radius: 16px;
+            padding: 12px 16px;
+            gap: 10px;
+            border: 0.5px solid var(--ios-separator);
+        }
+        .search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--ios-text);
+            font-size: 16px;
+            width: 100%;
+        }
+
+        /* شريط التبويبات السفلي */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--ios-glass);
+            backdrop-filter: blur(25px);
+            border-top: 0.5px solid var(--ios-separator);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 90;
+            padding-bottom: 15px;
+        }
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--ios-text-tertiary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab-item i { font-size: 20px; }
+        .tab-item.active { color: var(--ios-blue); }
+
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 350px;
+            background: rgba(128,128,128,0.05);
+            border-radius: 18px;
+            padding: 10px;
+            overflow-y: auto;
+            gap: 8px;
+        }
+        .msg { padding: 10px 14px; border-radius: 14px; max-width: 75%; font-size: 14px; }
+        .msg.incoming { background: var(--ios-card); align-self: flex-start; border: 0.5px solid var(--ios-separator); }
+        .msg.outgoing { background: var(--ios-blue); color: #fff; align-self: flex-end; }
+    </style>
+</head>
+<body data-theme="dark">
+
+<div class="iphone-container">
     
-    welcome_text = "✨ أهلاً بك يا غالي في استوديو الأيقونات والحزم الشفافة بدقة 100x100!\nاضغط على الزر أدناه لفتح التطبيق وتصميم وتصدير حزمك بكل أريحية:"
-    
-    if user_id == DEV_ID:
-        welcome_text += "\n\n🛠 **مرحباً بك يا مطورنا!** يمكنك إرسال كلمة `لوحة الأدمن` لعرض الإحصائيات."
+    <!-- ================= 1. قسم الأغاني (مع بادئة يوت التلقائية) ================= -->
+    <div class="app-screen active" id="screenMusic">
+        <div class="nav-bar">
+            <h1 class="nav-title">🎵 محرك الأغاني</h1>
+            <button class="ios-btn btn-icon" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+        </div>
+        <div class="content-body">
+            <div class="hub-card" style="background: linear-gradient(135deg, #007AFF, #5856D6); color: white;">
+                <h2>مكتبة الموسيقى الذكية</h2>
+                <p style="font-size: 13px; opacity: 0.85;">اكتب اسم الأغنية وسيقوم النظام تلقائياً بإضافة (يوت) للبحث السريع.</p>
+                <audio id="audioPlayer" controls style="width: 100%; margin-top: 10px; display: none;"></audio>
+            </div>
+
+            <div class="hub-card">
+                <div class="search-box">
+                    <span style="font-weight: 900; color: var(--ios-blue); background: rgba(0,122,255,0.1); padding: 4px 8px; border-radius: 8px;">يوت</span>
+                    <input type="text" id="musicQueryInput" placeholder="اكتب اسم الفنان أو الأغنية...">
+                </div>
+                <button class="ios-btn btn-primary" style="justify-content: center;" onclick="searchAndPlayMusic()">
+                    <i class="fa-solid fa-play"></i> بحث وتشغيل فوري
+                </button>
+            </div>
+
+            <div id="musicResultView"></div>
+        </div>
+    </div>
+
+    <!-- ================= 2. قسم الأصدقاء والدردشة الخاصة ================= -->
+    <div class="app-screen" id="screenFriends">
+        <div class="nav-bar">
+            <h1 class="nav-title">💬 الدردشة والأصدقاء</h1>
+            <button class="ios-btn btn-icon" onclick="openAddFriendModal()"><i class="fa-solid fa-user-plus"></i></button>
+        </div>
+        <div class="content-body">
+            <div id="friendsListView" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="hub-card" style="text-align: center; color: var(--ios-text-tertiary);">
+                    <p>لا توجد محادثات نشطة حالياً. اضغط على علامة (+) لإضافة صديق عبر معرف التليجرام (ID).</p>
+                </div>
+            </div>
+
+            <!-- نافذة الدردشة النشطة مع صديق -->
+            <div id="chatInterfaceView" class="hub-card" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--ios-separator); padding-bottom: 8px;">
+                    <span id="activeChatFriendName" style="font-weight: 700;">اسم الصديق</span>
+                    <button class="ios-btn" style="padding: 4px 10px; font-size: 11px;" onclick="closeChat()">إغلاق</button>
+                </div>
+                <div class="chat-box" id="chatMessagesBox"></div>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <div class="search-box" style="flex: 1; margin: 0; padding: 8px 12px;">
+                        <input type="text" id="messageInputText" placeholder="اكتب رسالتك...">
+                    </div>
+                    <button class="ios-btn btn-primary" style="padding: 10px 16px;" onclick="sendDirectMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= شريط التنقل السفلي ================= -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab(0, 'screenMusic')">
+            <i class="fa-solid fa-headphones"></i>
+            <span>الأغاني</span>
+        </div>
+        <div class="tab-item" onclick="switchTab(1, 'screenFriends')">
+            <i class="fa-solid fa-comments"></i>
+            <span>الدردشة</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // تهيئة تليجرام WebApp وسحب بيانات المستخدم الحقيقية تلقائياً
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+    let currentUser = tg.initDataUnsafe?.user || { id: 5126968608, first_name: "مطور التطبيق", username: "ddaweBot" };
+
+    // إعدادات اتصال Supabase (قم باستبدال الروابط بمعلومات مشروعك في سوبابيس عند الحاجة)
+    const SUPABASE_URL = 'https://your-supabase-project.supabase.co';
+    const SUPABASE_KEY = 'your-supabase-anon-key';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function switchTab(index, screenId) {
+        document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
         
-    await event.respond(welcome_text, buttons=keyboard)
+        const tabs = document.querySelectorAll('.tab-item');
+        tabs.forEach((tab, i) => {
+            if (i === index) tab.classList.add('active');
+            else tab.classList.remove('active');
+        });
+        if (navigator.vibrate) navigator.vibrate(10);
+    }
 
-@client.on(events.NewMessage(pattern='لوحة الأدمن'))
-async def dev_panel(event):
-    if event.sender_id != DEV_ID:
-        return
-    
-    panel_text = (
-        "🛠 **لوحة تحكم الأدمن المركزية (المطور):**\n\n"
-        f"• معرف المطور (ID): `{DEV_ID}`\n"
-        f"• إجمالي الحزم المصنوعة: `{stats_data['total_packs']}`\n"
-        f"• المستخدمين النشطين: `{len(stats_data['active_users'])}`\n"
-        "• حالة النظام: `يعمل بكفاءة وسلاسة تامة 100%`"
-    )
-    await event.respond(panel_text)
+    function toggleTheme() {
+        const body = document.body;
+        body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
 
-async def main():
-    await client.start(bot_token=BOT_TOKEN)
-    print("🤖 بوت استوديو الملصقات يعمل بكفاءة تامة...")
-    await client.run_until_disconnected()
+    // تشغيل محرك الأغاني مع بادئة "يوت"
+    function searchAndPlayMusic() {
+        const query = document.getElementById('musicQueryInput').value.trim();
+        if(!query) return alert('الرجاء كتابة اسم الأغنية أو الفنان');
+        
+        const fullSearchQuery = `يوت ${query}`;
+        const view = document.getElementById('musicResultView');
+        
+        view.innerHTML = `
+            <div class="hub-card" style="padding: 14px;">
+                <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">البحث بـ: ${fullSearchQuery}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 12px; color: var(--ios-text-tertiary);">جودة عالية - استماع مباشر</span>
+                    <button class="ios-btn btn-primary" style="padding: 8px 14px; font-size: 13px;" onclick="playStreamAudio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')">
+                        <i class="fa-solid fa-play"></i> تشغيل
+                    </button>
+                </div>
+            </div>
+        `;
+    }
 
-if __name__ == '__main__':
-    import threading
-    port = int(os.environ.get('PORT', 8080))
-    
-    flask_thread = threading.Thread(target=lambda: app.run(host='0.0.0.0', port=port, debug=False))
-    flask_thread.daemon = True
-    flask_thread.start()
-    
-    asyncio.run(main())
+    function playStreamAudio(url) {
+        const player = document.getElementById('audioPlayer');
+        player.src = url;
+        player.style.display = 'block';
+        player.play();
+    }
+
+    // إضافة صديق عبر الآي دي
+    function openAddFriendModal() {
+        const friendId = prompt("أدخل معرف (Telegram ID) الخاص بصديقك لإضافته:");
+        if(!friendId) return;
+        
+        const list = document.getElementById('friendsListView');
+        list.innerHTML = `
+            <div class="hub-card" style="flex-direction: row; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openChatWithFriend('${friendId}', 'صديق (${friendId})')">
+                <div>
+                    <div style="font-weight: 700;">صديق معرف: ${friendId}</div>
+                    <span style="font-size: 12px; color: var(--ios-green);">● متصل الآن</span>
+                </div>
+                <i class="fa-solid fa-chevron-left" style="font-size: 12px; color: var(--ios-text-tertiary);"></i>
+            </div>
+        `;
+        alert("تمت إضافة الصديق بنجاح!");
+    }
+
+    let activeChatTarget = null;
+    function openChatWithFriend(friendId, friendName) {
+        activeChatTarget = friendId;
+        document.getElementById('friendsListView').style.display = 'none';
+        document.getElementById('chatInterfaceView').style.display = 'flex';
+        document.getElementById('activeChatFriendName').innerText = friendName;
+        
+        const box = document.getElementById('chatMessagesBox');
+        box.innerHTML = `<div class="msg incoming">مرحباً! بدأت المحادثة المباشرة مع صديقك.</div>`;
+    }
+
+    function closeChat() {
+        document.getElementById('chatInterfaceView').style.display = 'none';
+        document.getElementById('friendsListView').style.display = 'flex';
+    }
+
+    function sendDirectMessage() {
+        const input = document.getElementById('messageInputText');
+        const text = input.value.trim();
+        if(!text) return;
+
+        const box = document.getElementById('chatMessagesBox');
+        box.innerHTML += `<div class="msg outgoing">${text}</div>`;
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // محاكاة استجابة حية
+        setTimeout(() => {
+            box.innerHTML += `<div class="msg incoming">وصلتني رسالتك يا غالي! 👍</div>`;
+            box.scrollTop = box.scrollHeight;
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
