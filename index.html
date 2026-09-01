@@ -646,7 +646,7 @@
             <h1 class="nav-title">استوديو الملصقات</h1>
             <div class="flex-row">
                 <button class="ios-btn btn-icon" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
-                <button class="ios-btn btn-icon" onclick="openProfile()"><i class="fa-solid fa-user"></i></button>
+                <button class="ios-btn btn-icon" onclick="switchScreen('screenSettings'); setActiveTab(3)"><i class="fa-solid fa-user"></i></button>
             </div>
         </div>
 
@@ -654,7 +654,7 @@
             <div class="hero-card">
                 <h2 class="hero-title">اصنع ملصقاتك بإتقان</h2>
                 <p class="hero-subtitle">حوّل أفكارك ولحظاتك إلى حزم ملصقات احترافية متوافقة مع تليجرام بنقرة واحدة.</p>
-                <button class="ios-btn btn-primary" onclick="switchScreen('screenEditor')">
+                <button class="ios-btn btn-primary" onclick="switchScreen('screenEditor'); setActiveTab(1)">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> ابدأ التصميم الآن
                 </button>
             </div>
@@ -673,20 +673,20 @@
             <div>
                 <div class="section-header">
                     <h3 class="section-title">حزمي المفضلة</h3>
-                    <span class="section-action">عرض الكل</span>
+                    <span class="section-action" onclick="switchScreen('screenPacks'); setActiveTab(2)">عرض الكل</span>
                 </div>
                 <div class="horizontal-scroll">
-                    <div class="pack-card" onclick="switchScreen('screenEditor')">
+                    <div class="pack-card" onclick="switchScreen('screenEditor'); setActiveTab(1)">
                         <div class="pack-preview">🔥</div>
                         <div style="font-weight: 700; font-size: 14px;">حماسية جداً</div>
                         <span class="text-secondary">12 ملصق</span>
                     </div>
-                    <div class="pack-card" onclick="switchScreen('screenEditor')">
+                    <div class="pack-card" onclick="switchScreen('screenEditor'); setActiveTab(1)">
                         <div class="pack-preview">😎</div>
                         <div style="font-weight: 700; font-size: 14px;">يوميات فخمة</div>
                         <span class="text-secondary">24 ملصق</span>
                     </div>
-                    <div class="pack-card" onclick="switchScreen('screenEditor')">
+                    <div class="pack-card" onclick="switchScreen('screenEditor'); setActiveTab(1)">
                         <div class="pack-preview">🚀</div>
                         <div style="font-weight: 700; font-size: 14px;">إيموجي مخصص</div>
                         <span class="text-secondary">8 ملصقات</span>
@@ -713,7 +713,7 @@
                             <span class="text-secondary">جاهز للكتابة والتصدير الفوري</span>
                         </div>
                     </div>
-                    <button class="ios-btn btn-capsule btn-primary" onclick="switchScreen('screenEditor')">استخدام</button>
+                    <button class="ios-btn btn-capsule btn-primary" onclick="switchScreen('screenEditor'); setActiveTab(1)">استخدام</button>
                 </div>
             </div>
         </div>
@@ -724,31 +724,29 @@
     <!-- ============================================== -->
     <div class="app-screen" id="screenEditor">
         <div class="nav-bar">
-            <button class="ios-btn btn-icon" onclick="switchScreen('screenHome')"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="ios-btn btn-icon" onclick="switchScreen('screenHome'); setActiveTab(0)"><i class="fa-solid fa-chevron-right"></i></button>
             <h2 class="nav-title" style="font-size: 17px;">محرر الملصقات الاحترافي</h2>
             <button class="ios-btn btn-capsule btn-primary" onclick="triggerExport()">إنشاء الحزمة</button>
         </div>
 
         <div class="editor-container">
             <div class="floating-toolbar">
-                <button class="ios-btn btn-icon" onclick="undoAction()"><i class="fa-solid fa-rotate-left"></i></button>
+                <button class="ios-btn btn-icon" onclick="resetCanvasTransform()"><i class="fa-solid fa-rotate-left"></i></button>
                 <div class="ios-segmented" style="width: 140px;">
                     <div class="segment-item active" style="font-size: 11px;">Canvas</div>
-                    <div class="segment-item" style="font-size: 11px;" onclick="toggleZoom()">Zoom</div>
+                    <div class="segment-item" style="font-size: 11px;" onclick="centerTextElement()">توسيط</div>
                 </div>
-                <button class="ios-btn btn-icon" onclick="redoAction()"><i class="fa-solid fa-rotate-right"></i></button>
+                <button class="ios-btn btn-icon" onclick="clearCanvasText()"><i class="fa-solid fa-trash-can"></i></button>
             </div>
 
             <div class="canvas-area">
-                <!-- الكانفاس بخلفية شفافة تماماً مع مربعات الشفافية الاحترافية -->
                 <div class="sticker-canvas" id="mainCanvas">
-                    <div class="canvas-element selected" id="sampleText" contenteditable="true" style="font-size: 28px; font-weight: 900; color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                    <div class="canvas-element selected" id="sampleText" contenteditable="true" style="font-size: 40px; font-weight: 900; color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.25);">
                         فخم ✨
                     </div>
                 </div>
             </div>
 
-            <!-- شريط الأدوات السفلي للمحرر -->
             <div class="editor-tools-dock" id="toolsDock">
                 <div class="tool-btn active" onclick="openSheet('sheetText')">
                     <i class="fa-solid fa-font"></i>
@@ -774,16 +772,16 @@
         </div>
 
         <!-- Dynamic Bottom Sheets -->
-        <!-- 1. خصائص النص والحجم -->
         <div class="bottom-sheet open" id="sheetText">
             <div class="sheet-handle" onclick="closeSheets()"></div>
-            <div style="font-weight: 700; font-size: 16px; margin-bottom: 14px;">خصائص النص وحجم الخط</div>
+            <div style="font-weight: 700; font-size: 16px; margin-bottom: 14px;">خصائص النص وحجم الخط (أكبر من 70)</div>
             <div class="ios-slider-group">
                 <div class="slider-label-row">
-                    <span>حجم الخط (Font Size)</span>
-                    <span class="text-secondary" id="sizeVal">28px</span>
+                    <span>حجم الخط الضخم (Font Size)</span>
+                    <span class="text-secondary" id="sizeVal">40px</span>
                 </div>
-                <input type="range" min="14" max="70" value="28" class="ios-slider" oninput="updateTextSize(this.value)">
+                <!-- تم توسيع النطاق إلى 140px ليكون حجم الخط ضخماً جداً وحقيقياً -->
+                <input type="range" min="14" max="140" value="40" class="ios-slider" oninput="updateTextSize(this.value)">
             </div>
             <div class="ios-slider-group">
                 <div class="slider-label-row">
@@ -794,7 +792,6 @@
             </div>
         </div>
 
-        <!-- 2. قائمة الخطوط الإضافية الفخمة -->
         <div class="bottom-sheet" id="sheetFont">
             <div class="sheet-handle" onclick="closeSheets()"></div>
             <div style="font-weight: 700; font-size: 16px; margin-bottom: 14px;">اختر الخط المميز</div>
@@ -807,7 +804,6 @@
             <div class="font-option" style="font-family: 'Lalezar', cursive;" onclick="changeFont('Lalezar')">لالزار البارز (Lalezar)</div>
         </div>
 
-        <!-- 3. لوحة الألوان الذكية -->
         <div class="bottom-sheet" id="sheetColor">
             <div class="sheet-handle" onclick="closeSheets()"></div>
             <div style="font-weight: 700; font-size: 16px; margin-bottom: 14px;">لوحة الألوان الذكية</div>
@@ -821,7 +817,6 @@
             </div>
         </div>
 
-        <!-- 4. إعدادات حزمة الملصقات الفعلية (لربطها بالبوت والاستضافة) -->
         <div class="bottom-sheet" id="sheetPack">
             <div class="sheet-handle" onclick="closeSheets()"></div>
             <div style="font-weight: 700; font-size: 16px; margin-bottom: 14px;">إعدادات الحزمة وتصديرها لتليجرام</div>
@@ -830,17 +825,68 @@
                 <input type="text" id="packNameInput" class="pack-name-input" value="VIP_Stickers_Pack" placeholder="أدخل اسم الحزمة بالإنجليزية...">
             </div>
             <button class="ios-btn btn-primary" style="width: 100%; margin-top: 6px;" onclick="triggerActualExport()">
-                <i class="fa-solid fa-cloud-arrow-up"></i> إنشاء الحزمة وإرسالها للبوت
+                <i class="fa-solid fa-cloud-arrow-up"></i> إنشاء الحزمة ورفعها لتليجرام فعلياً
             </button>
         </div>
 
-        <!-- 5. الطبقات -->
         <div class="bottom-sheet" id="sheetLayers">
             <div class="sheet-handle" onclick="closeSheets()"></div>
             <div style="font-weight: 700; font-size: 16px; margin-bottom: 14px;">مدير الطبقات</div>
             <div style="background: rgba(128,128,128,0.1); border-radius: 16px; padding: 12px; display: flex; align-items: center; justify-content: space-between;">
                 <div class="flex-row"><i class="fa-solid fa-font"></i> <span>نص: قابل للتعديل المباشر ✨</span></div>
                 <i class="fa-solid fa-bars" style="color: var(--ios-text-tertiary);"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 3: PACKS MANAGER -->
+    <!-- ============================================== -->
+    <div class="app-screen" id="screenPacks">
+        <div class="nav-bar">
+            <button class="ios-btn btn-icon" onclick="switchScreen('screenHome'); setActiveTab(0)"><i class="fa-solid fa-chevron-right"></i></button>
+            <h2 class="nav-title" style="font-size: 17px;">إدارة الحزم المحفوظة</h2>
+            <button class="ios-btn btn-icon" onclick="switchScreen('screenEditor'); setActiveTab(1)"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;" id="packsListContainer">
+            <div style="background: var(--ios-card); padding: 18px; border-radius: 20px; border: 0.5px solid var(--ios-separator); display: flex; align-items: center; justify-content: space-between;">
+                <div class="flex-row">
+                    <div style="font-size: 28px; background: rgba(0,122,255,0.1); width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center;">👑</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 15px;">VIP_Status_Pack</div>
+                        <span class="text-secondary">تم إنشاؤها بنجاح (شفافة 100x100)</span>
+                    </div>
+                </div>
+                <span style="color: var(--ios-green); font-weight: 700; font-size: 13px;">نشطة</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 4: SETTINGS -->
+    <!-- ============================================== -->
+    <div class="app-screen" id="screenSettings">
+        <div class="nav-bar">
+            <button class="ios-btn btn-icon" onclick="switchScreen('screenHome'); setActiveTab(0)"><i class="fa-solid fa-chevron-right"></i></button>
+            <h2 class="nav-title" style="font-size: 17px;">إعدادات الحساب</h2>
+            <div></div>
+        </div>
+        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: var(--ios-card); padding: 18px; border-radius: 20px; border: 0.5px solid var(--ios-separator); display: flex; align-items: center; justify-content: space-between;">
+                <div class="flex-row">
+                    <div style="font-size: 20px; color: var(--ios-blue); background: rgba(0,122,255,0.1); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user-shield"></i></div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 15px;">حالة المشترك المميز</div>
+                        <span class="text-secondary" id="userTelegramId">مفعل عبر تليجرام WebApp</span>
+                    </div>
+                </div>
+            </div>
+            <div style="background: var(--ios-card); padding: 18px; border-radius: 20px; border: 0.5px solid var(--ios-separator); display: flex; align-items: center; justify-content: space-between;">
+                <div class="flex-row">
+                    <div style="font-size: 20px; color: var(--ios-orange); background: rgba(255,149,0,0.1); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-moon"></i></div>
+                    <div style="font-weight: 700; font-size: 15px;">الوضع الليلي / المضيء</div>
+                </div>
+                <button class="ios-btn btn-capsule btn-primary" onclick="toggleTheme()">تبديل</button>
             </div>
         </div>
     </div>
@@ -857,11 +903,11 @@
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             <span>المحرر</span>
         </div>
-        <div class="tab-item" onclick="openProfile(); setActiveTab(2)">
+        <div class="tab-item" onclick="switchScreen('screenPacks'); setActiveTab(2)">
             <i class="fa-solid fa-box-archive"></i>
             <span>الحزم</span>
         </div>
-        <div class="tab-item" onclick="openProfile(); setActiveTab(3)">
+        <div class="tab-item" onclick="switchScreen('screenSettings'); setActiveTab(3)">
             <i class="fa-solid fa-gear"></i>
             <span>الإعدادات</span>
         </div>
@@ -871,9 +917,10 @@
     <div class="modal-overlay" id="successModal">
         <div class="modal-card">
             <div class="success-icon"><i class="fa-solid fa-check"></i></div>
-            <div style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">تم إرسال الملصق للحزمة!</div>
-            <p class="text-secondary" style="margin-bottom: 24px;">تم توليد الحزمة بخلفية شفافة دقيقة وإرسالها للبوت بنجاح.</p>
-            <button class="ios-btn btn-primary" style="width: 100%;" onclick="closeExportModal()">رائع، شكراً</button>
+            <div style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">تم إنشاء الحزمة ورفعها!</div>
+            <p class="text-secondary" style="margin-bottom: 24px;" id="successModalText">تم توليد الحزمة بخلفية شفافة دقيقة ورفعها لتليجرام بنجاح.</p>
+            <button class="ios-btn btn-primary" style="width: 100%; margin-bottom: 10px;" id="openStickerLinkBtn">إضافة الحزمة لتليجرام</button>
+            <button class="ios-btn btn-glass" style="width: 100%;" onclick="closeExportModal()">إغلاق</button>
         </div>
     </div>
 </div>
@@ -881,6 +928,10 @@
 <script>
     let tg = window.Telegram.WebApp;
     tg.expand();
+
+    if (tg.initDataUnsafe?.user?.id) {
+        document.getElementById('userTelegramId').innerText = "ID: " + tg.initDataUnsafe.user.id;
+    }
 
     function switchScreen(screenId) {
         document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
@@ -924,6 +975,7 @@
         document.querySelectorAll('.bottom-sheet').forEach(sheet => sheet.classList.remove('open'));
     }
 
+    // تمكين زيادة حجم الخط حتى 140px
     function updateTextSize(val) {
         document.getElementById('sampleText').style.fontSize = val + 'px';
         document.getElementById('sizeVal').innerText = val + 'px';
@@ -947,18 +999,36 @@
         openSheet('sheetPack');
     }
 
-    // دالة إنشاء الحزمة الفعلي والاتصال بالسيرفر (للرفع على الاستضافة وربط البوت)
+    function resetCanvasTransform() {
+        document.getElementById('sampleText').style.transform = 'rotate(0deg)';
+        document.getElementById('sampleText').style.fontSize = '40px';
+        document.getElementById('sizeVal').innerText = '40px';
+        document.getElementById('rotVal').innerText = '0°';
+    }
+
+    function centerTextElement() {
+        const el = document.getElementById('sampleText');
+        el.style.top = '50%';
+        el.style.left = '50%';
+        el.style.transform = 'translate(-50%, -50%)';
+    }
+
+    function clearCanvasText() {
+        document.getElementById('sampleText').innerText = '👑';
+    }
+
+    let savedPacksList = [];
+
     function triggerActualExport() {
         const textValue = document.getElementById('sampleText').innerText.trim() || 'VIP';
         const textColor = document.getElementById('sampleText').style.color || '#FFFFFF';
-        const packName = document.getElementById('packNameInput').value.trim() || 'VIP_Pack';
-        const fontSize = document.getElementById('sampleText').style.fontSize || '28px';
+        const packName = document.getElementById('packNameInput').value.trim() || 'VIP_Stickers_Pack';
 
         if (tg.HapticFeedback) {
             tg.HapticFeedback.notificationOccurred('success');
         }
 
-        // إرسال البيانات لسيرفر البوت (Python Backend) لإنشاء الملصق الشفاف الفعلي والحزمة
+        // إرسال البيانات الفعلية لسيرفر البوت لإنشاء الملصق ورفعه لتليجرام
         fetch('/api/create-pack', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -966,44 +1036,75 @@
                 text: textValue,
                 color: textColor,
                 pack_name: packName,
-                font_size: fontSize,
-                user_id: tg.initDataUnsafe?.user?.id || 123456
+                user_id: tg.initDataUnsafe?.user?.id || 5126968608
             })
         })
         .then(res => res.json())
         .then(data => {
             closeSheets();
             if (data.status === 'success') {
+                document.getElementById('successModalText').innerText = "تم إنشاء الحزمة بخلفية شفافة (100x100) ورفعها لتليجرام بنجاح!";
+                document.getElementById('openStickerLinkBtn').onclick = function() {
+                    window.open(data.pack_link, '_blank');
+                };
                 document.getElementById('successModal').classList.add('active');
-                // إرسال الرد المباشر لبيانات تليجرام وإغلاق التطبيق المصغر بأمان
+
+                // إضافة الحزمة لقائمة الحزم المحفوظة محلياً في واجهة المستخدم
+                savedPacksList.push({ name: packName, link: data.pack_link });
+                renderPacksList();
+
                 if (tg.sendData) {
                     tg.sendData(JSON.stringify({
                         action: "pack_created",
-                        link: data.pack_link,
-                        file: data.file_path
+                        link: data.pack_link
                     }));
                 }
             } else {
-                alert('فشل في إنشاء الحزمة: ' + (data.error || 'خطأ غير معروف'));
+                alert('فشل في رفع الحزمة لتليجرام: ' + (data.error || 'خطأ غير معروف'));
             }
         })
         .catch(err => {
             console.error(err);
-            alert('تعذر الاتصال بسيرفر الاستضافة لتوليد الحزمة');
+            alert('تعذر الاتصال بسيرفر الاستضافة لتوليد الحزمة ورفعها');
         });
+    }
+
+    function renderPacksList() {
+        const container = document.getElementById('packsListContainer');
+        let html = `
+            <div style="background: var(--ios-card); padding: 18px; border-radius: 20px; border: 0.5px solid var(--ios-separator); display: flex; align-items: center; justify-content: space-between;">
+                <div class="flex-row">
+                    <div style="font-size: 28px; background: rgba(0,122,255,0.1); width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center;">👑</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 15px;">VIP_Status_Pack</div>
+                        <span class="text-secondary">نشطة (شفافة 100x100)</span>
+                    </div>
+                </div>
+                <span style="color: var(--ios-green); font-weight: 700; font-size: 13px;">مفعلة</span>
+            </div>
+        `;
+        savedPacksList.forEach(p => {
+            html += `
+                <div style="background: var(--ios-card); padding: 18px; border-radius: 20px; border: 0.5px solid var(--ios-separator); display: flex; align-items: center; justify-content: space-between;">
+                    <div class="flex-row">
+                        <div style="font-size: 28px; background: rgba(52,199,89,0.1); width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center;">✨</div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 15px;">${p.name}</div>
+                            <a href="${p.link}" target="_blank" style="color: var(--ios-blue); font-size: 12px; text-decoration: none;">فتح الحزمة في تليجرام</a>
+                        </div>
+                    </div>
+                    <span style="color: var(--ios-blue); font-weight: 700; font-size: 13px;">تم الرفع</span>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
     }
 
     function closeExportModal() {
         document.getElementById('successModal').classList.remove('active');
         switchScreen('screenHome');
         setActiveTab(0);
-        if (tg.close) tg.close();
     }
-
-    function undoAction() { alert('تم التراجع عن الخطوة الأخيرة'); }
-    function redoAction() { alert('إعادة الخطوة'); }
-    function toggleZoom() { alert('تبديل وضع التكبير للكانفاس'); }
-    function openProfile() { alert('فتح لوحة إعدادات الحساب والحزم'); }
 </script>
 
 </body>
