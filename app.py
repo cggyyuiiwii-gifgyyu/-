@@ -1,5 +1,7 @@
 import os
 import asyncio
+import re
+import requests
 from flask import Flask, render_template_string, request, jsonify
 from PIL import Image, ImageDraw, ImageFont
 from telethon import TelegramClient, events
@@ -9,7 +11,7 @@ API_ID = int(os.environ.get('API_ID', 1234567))
 API_HASH = os.environ.get('API_HASH', 'your_api_hash')
 BOT_TOKEN = os.environ.get('BOT_TOKEN', 'your_bot_token')
 MINI_APP_URL = "https://daring-encouragement-production-3257.up.railway.app"
-DEV_ID = 5126968608  # معرف المطور الخاص بك
+DEV_ID = 5126968608  # معرف الآي دي الخاص بك للمطور
 
 app = Flask(__name__)
 TEMP_DIR = 'temp_badges'
@@ -25,16 +27,24 @@ def index():
         return render_template_string(html_content)
     return "<h1>الملف index.html غير موجود!</h1>", 404
 
+# API لإنشاء حزمة جديدة أو إضافة ملصقات متعددة لنفس الحزمة بنجاح
 @app.route('/api/create-pack', methods=['POST'])
 def api_create_pack():
     data = request.json
     text = data.get('text', '👑')
     color = data.get('color', '#FFFFFF')
-    pack_title = data.get('pack_name', 'VIP Status Pack')
+    raw_title = data.get('pack_name', 'VIP Status Pack')
     user_id = data.get('user_id', DEV_ID)
+    action_type = data.get('action_type', 'new') # new لإنشاء حزمة جديدة، add لإضافة ملصق لحزمة موجودة
+    target_pack = data.get('target_pack', '')
+
+    clean_title = re.sub(r'[^a-zA-Z0-9]', '', raw_title).lower()
+    if not clean_title:
+        clean_title = "vipsticker"
+        
+    safe_name = target_pack if (action_type == 'add' and target_pack) else f"{clean_title}_{user_id}_by_bot"
     
-    safe_name = f"vip_badge_{user_id}_{os.urandom(2).hex()}_by_bot"
-    
+    # مقاس أيقونة الحالة الدقيق في تليجرام 100x100 بكسل بخلفية شفافة
     size = (100, 100)
     image = Image.new("RGBA", size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -54,61 +64,82 @@ def api_create_pack():
     draw.text((x + 2, y + 2), text, font=font, fill=(0, 0, 0, 200))
     draw.text((x, y), text, font=font, fill=color)
     
-    file_path = os.path.join(TEMP_DIR, f"{safe_name}.png")
+    file_path = os.path.join(TEMP_DIR, f"{safe_name}_{os.urandom(2).hex()}.png")
     image.save(file_path, "PNG", optimize=True)
     
-    import requests
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/createNewStickerSet"
-    
-    with open(file_path, 'rb') as sticker_file:
-        files = {'png_sticker': sticker_file}
-        payload = {
-            'user_id': user_id,
-            'name': safe_name,
-            'title': pack_title,
-            'sticker_format': 'static',
-            'emojis': '👑'
-        }
-        response = requests.post(url, data=payload, files=files)
-        res_json = response.json()
-    
-    if res_json.get('ok'):
-        pack_link = f"https://t.me/addstickers/{safe_name}"
-        return jsonify({'status': 'success', 'pack_link': pack_link})
-    else:
-        alt_name = f"badge_{user_id}_{os.urandom(3).hex()}_by_bot"
-        payload['name'] = alt_name
+    if action_type == 'add':
+        # إضافة ملصق جديد لحزمة موجودة مسبقاً
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/addStickerToSet"
         with open(file_path, 'rb') as sticker_file:
             files = {'png_sticker': sticker_file}
+            payload = {
+                'user_id': user_id,
+                'name': safe_name,
+                'emoji_list': ['👑']
+            }
+            response = requests.post(url, data=payload, files=files)
+            res_json = response.json()
+    else:
+        # إنشاء حزمة ملصقات جديدة كلياً
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/createNewStickerSet"
+        with open(file_path, 'rb') as sticker_file:
+            files = {'png_sticker': sticker_file}
+            payload = {
+                'user_id': user_id,
+                'name': safe_name,
+                'title': raw_title,
+                'sticker_format': 'static',
+                'emojis': '👑'
+            }
             response = requests.post(url, data=payload, files=files)
             res_json = response.json()
             
-        if res_json.get('ok'):
-            pack_link = f"https://t.me/addstickers/{alt_name}"
-            return jsonify({'status': 'success', 'pack_link': pack_link})
-        else:
-            return jsonify({'status': 'error', 'error': res_json.get('description', 'خطأ غير معروف')})
+            # لو الاسم مستخدم من قبل، ننشئ اسماً بديلاً تلقائياً
+            if not res_json.get('ok'):
+                safe_name = f"pack{user_id}{os.urandom(3).hex()}bybot"
+                payload['name'] = safe_name
+                response = requests.post(url, data=payload, files=files)
+                res_json = response.json()
+    
+    if res_json.get('ok'):
+        pack_link = f"https://t.me/addstickers/{safe_name}"
+        return jsonify({'status': 'success', 'pack_link': pack_link, 'pack_name': safe_name})
+    else:
+        return jsonify({'status': 'error', 'error': res_json.get('description', 'خطأ غير معروف من تليجرام')})
 
 @client.on(events.NewMessage(pattern='/start'))
 async def start(event):
-    # زر التطبيق المصغر فقط لتجنب أي تعارض في الأزرار
+    sender = await event.get_sender()
+    user_id = sender.id
+    
     button_webapp = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
     keyboard = ReplyInlineMarkup(rows=[KeyboardButtonRow(buttons=[button_webapp])])
     
-    await event.respond(
-        "✨ أهلاً بك يا غالي في استوديو الأيقونات المميزة!\nاضغط على الزر أدناه لفتح التطبيق وتصميم حزمة ملصقاتك الشفافة بدقة 100x100:", 
-        buttons=keyboard
-    )
+    welcome_text = "✨ أهلاً بك يا غالي في استوديو الأيقونات والحزم الشفافة بدقة 100x100!\nاضغط على الزر أدناه لفتح التطبيق وتصميم وإدارة حزمك بكل أريحية:"
+    
+    # لو المستخدم هو المطور الأساسي (بالآي دي والمعرف المحدد)
+    if user_id == DEV_ID:
+        welcome_text += "\n\n🛠 **مرحباً بك يا مطورنا الأساسي!** يمكنك إرسال كلمة `لوحة المطور` للوصول للتحكم الإداري."
+        
+    await event.respond(welcome_text, buttons=keyboard)
 
 @client.on(events.NewMessage(pattern='لوحة المطور'))
 async def dev_panel(event):
     if event.sender_id != DEV_ID:
         return
-    await event.respond("🛠 **أهلاً بك يا مطورنا في لوحة التحكم المركزية:**\n- الحالة: النظام يعمل بكفاءة تامة على ريلواي 🚀")
+    
+    panel_text = (
+        "🛠 **لوحة تحكم المشرف (المطور الأساسي):**\n\n"
+        "• معرف المطور (ID): `5126968608`\n"
+        "• حالة السيرفر والنظام: `يعمل بكفاءة تامة 100%`\n"
+        "• ميزة إضافة عدة ملصقات للحزمة: `مفعلة ونشطة`\n\n"
+        "الخيارات الإدارية متاحة للتحكم الكامل بالمستخدمين والحزم."
+    )
+    await event.respond(panel_text)
 
 async def main():
     await client.start(bot_token=BOT_TOKEN)
-    print("🤖 بوت أيقونات الحالة المميزة يعمل بكفاءة تامة...")
+    print("🤖 بوت استوديو الملصقات ولوحة تحكم المطور يعملان بكفاءة تامة...")
     await client.run_until_disconnected()
 
 if __name__ == '__main__':
