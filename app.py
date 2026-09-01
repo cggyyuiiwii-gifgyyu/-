@@ -1,10 +1,9 @@
 import os
 import asyncio
-import aiohttp
 from flask import Flask, render_template_string, request, jsonify
 from PIL import Image, ImageDraw, ImageFont
 from telethon import TelegramClient, events
-from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButtonWebView, KeyboardButtonCallback, InlineKeyboardButton
+from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButtonWebView
 
 API_ID = int(os.environ.get('API_ID', 1234567))
 API_HASH = os.environ.get('API_HASH', 'your_api_hash')
@@ -26,7 +25,6 @@ def index():
         return render_template_string(html_content)
     return "<h1>الملف index.html غير موجود!</h1>", 404
 
-# API لإنشاء ورسم الملصق الشفاف بدقة 100x100 ورفعه لتليجرام
 @app.route('/api/create-pack', methods=['POST'])
 def api_create_pack():
     data = request.json
@@ -35,10 +33,8 @@ def api_create_pack():
     pack_title = data.get('pack_name', 'VIP Status Pack')
     user_id = data.get('user_id', DEV_ID)
     
-    # اسم حزمة فريد يتماشى مع شروط تليجرام (يجب أن ينتهي بـ _by_botname)
     safe_name = f"vip_badge_{user_id}_{os.urandom(2).hex()}_by_bot"
     
-    # المقاس الدقيق لأيقونة الحالة في تليجرام 100x100 بخلفية شفافة تماماً
     size = (100, 100)
     image = Image.new("RGBA", size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -61,7 +57,6 @@ def api_create_pack():
     file_path = os.path.join(TEMP_DIR, f"{safe_name}.png")
     image.save(file_path, "PNG", optimize=True)
     
-    # تنفيذ رفع الملصق وإنشاء الحزمة تلقائياً عبر Telegram Bot API
     import requests
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/createNewStickerSet"
     
@@ -81,7 +76,6 @@ def api_create_pack():
         pack_link = f"https://t.me/addstickers/{safe_name}"
         return jsonify({'status': 'success', 'pack_link': pack_link})
     else:
-        # محاولة إنشاء حزمة باسم بديل في حال حدث تكرار
         alt_name = f"badge_{user_id}_{os.urandom(3).hex()}_by_bot"
         payload['name'] = alt_name
         with open(file_path, 'rb') as sticker_file:
@@ -93,18 +87,16 @@ def api_create_pack():
             pack_link = f"https://t.me/addstickers/{alt_name}"
             return jsonify({'status': 'success', 'pack_link': pack_link})
         else:
-            return jsonify({'status': 'error', 'error': res_json.get('description', 'خطأ غير معروف من تليجرام')})
+            return jsonify({'status': 'error', 'error': res_json.get('description', 'خطأ غير معروف')})
 
 @client.on(events.NewMessage(pattern='/start'))
 async def start(event):
     sender = await event.get_sender()
     user_id = sender.id
     
-    # زر فتح التطبيق المصغر الشفاف
     button_webapp = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
     rows = [KeyboardButtonRow(buttons=[button_webapp])]
     
-    # لو إضافية للمطور لو دخل البوت
     if user_id == DEV_ID:
         from telethon.tl.types import KeyboardButton
         rows.append(KeyboardButtonRow(buttons=[KeyboardButton(text="⚙️ لوحة تحكم المطور")]))
@@ -123,14 +115,12 @@ async def dev_panel(event):
     text = (
         "🛠 **أهلاً بك يا مطورنا في لوحة التحكم المركزية:**\n\n"
         "• حالة البوت: `يعمل بكفاءة على Railway`\n"
-        "• إصدار السيرفر: `Flask + Telethon`\n"
-        "• الأداة: `توليد ورفع الملصقات الشفافة تلقائياً`\n\n"
+        "• إصدار السيرفر: `Flask + Telethon`\n\n"
         "اختر العملية المطلوبة:"
     )
     from telethon.tl.types import KeyboardButton
     keyboard = ReplyInlineMarkup(rows=[
-        KeyboardButtonRow(buttons=[KeyboardButton(text="📊 إحصائيات البوت"), KeyboardButton(text="📢 إرسال إذاعة عامة")]),
-        KeyboardButtonRow(buttons=[KeyboardButton(text="🔙 العودة للرئيسية")])
+        KeyboardButtonRow(buttons=[KeyboardButton(text="📊 إحصائيات البوت"), KeyboardButton(text="🔙 العودة للرئيسية")])
     ])
     await event.respond(text, buttons=keyboard)
 
@@ -138,7 +128,7 @@ async def dev_panel(event):
 async def bot_stats(event):
     if event.sender_id != DEV_ID:
         return
-    await event.respond("📊 **إحصائيات النظام:**\n- المستخدمين النشطين: 1\n- الحزم المصنوعة: متصلة بالسيرفر وجاهزة.\n- استجابة الـ API: ممتازة (100%)")
+    await event.respond("📊 **إحصائيات النظام:**\n- الحالة: نشط ويعمل 100%\n- الرفع: مرتبط بـ Telegram Bot API مباشرة")
 
 @client.on(events.NewMessage(pattern='🔙 العودة للرئيسية'))
 async def back_home(event):
