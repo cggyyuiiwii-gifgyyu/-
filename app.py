@@ -58,7 +58,7 @@ def api_create_pack():
     file_path = os.path.join(TEMP_DIR, f"{pack_name}_{os.urandom(2).hex()}.png")
     image.save(file_path, "PNG", optimize=True)
     
-    # رابط الحزمة المباشر على تليجرام (يمكن ربطه برفع الحزمة برمجياً لاحقاً)
+    # رابط الحزمة المباشر على تليجرام
     pack_link = f"https://t.me/addstickers/{pack_name}"
     
     return jsonify({
@@ -80,6 +80,7 @@ async def main():
 
 if __name__ == '__main__':
     import threading
-    port = int(os.environ.get('PORT', 5000))
+    # ضبط قراءة المنفذ ليتوافق تماماً مع منفذ Railway (8080 أو المتغير البيئي)
+    port = int(os.environ.get('PORT', 8080))
     threading.Thread(target=lambda: app.run(host='0.0.0.0', port=port, debug=False)).start()
     asyncio.run(main())
