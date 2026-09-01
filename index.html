@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سومركرام — SomerGram</title>
+    <title>سومركرام — SomerGram Ultra Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -36,57 +36,26 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
         
-        /* ضبط الشاشة لتملأ الموبايل بالكامل بدون أي إطارات أو حواف بيضاء */
         html, body {
-            width: 100%;
-            height: 100%;
-            background-color: var(--tg-bg);
-            color: var(--tg-text);
-            overflow: hidden;
+            width: 100%; height: 100%; background-color: var(--tg-bg); color: var(--tg-text); overflow: hidden;
         }
 
         .iphone-container {
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            background-color: var(--tg-bg);
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            width: 100%; height: 100vh; height: 100dvh; background-color: var(--tg-bg);
+            position: absolute; top: 0; left: 0; display: flex; flex-direction: column; overflow: hidden;
         }
 
         .app-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: calc(100vh - 60px);
-            height: calc(100dvh - 60px);
-            display: flex;
-            flex-direction: column;
-            padding-top: 5px;
-            padding-bottom: 20px;
-            overflow-y: auto;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
+            position: absolute; top: 0; left: 0; width: 100%; height: calc(100vh - 60px); height: calc(100dvh - 60px);
+            display: flex; flex-direction: column; padding-top: 5px; padding-bottom: 20px;
+            overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
         }
         .app-screen.active { opacity: 1; pointer-events: auto; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
 
         .nav-bar {
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--tg-bg);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            border-bottom: 0.5px solid var(--tg-separator);
+            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--tg-bg); position: sticky; top: 0; z-index: 50; border-bottom: 0.5px solid var(--tg-separator);
         }
         .nav-title { font-size: 18px; font-weight: 700; }
 
@@ -97,7 +66,7 @@
         }
         .tg-btn:active { opacity: 0.8; }
         
-        .content-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 30px; }
+        .content-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
 
         .tg-group {
             background: var(--tg-card); border-radius: 14px; overflow: hidden;
@@ -117,7 +86,7 @@
         }
         .input-box input { background: transparent; border: none; outline: none; color: var(--tg-text); font-size: 15px; width: 100%; }
 
-        /* شريط الستوريات العلوي الحقيقي */
+        /* شريط الستوريات العلوي */
         .stories-bar {
             display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto;
             border-bottom: 0.5px solid var(--tg-separator); background: var(--tg-card);
@@ -131,7 +100,7 @@
         .story-img { width: 50px; height: 50px; border-radius: 50%; background: var(--tg-bg); object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--tg-text); background-size: cover; background-position: center; }
         .story-name { font-size: 11px; color: var(--tg-text); text-overflow: ellipsis; overflow: hidden; width: 60px; text-align: center; white-space: nowrap; }
 
-        /* شريط التنقل السفلي الثابت والواضح تماماً */
+        /* شريط التنقل السفلي */
         .tab-bar {
             position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
             background: var(--tg-tab-bg); backdrop-filter: blur(20px);
@@ -169,7 +138,7 @@
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="font-size: 50px; color: var(--tg-blue); margin-bottom: 10px;"><i class="fa-brands fa-telegram"></i></div>
             <h1 style="font-size: 22px; font-weight: 800;">سومركرام (SomerGram)</h1>
-            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الأقوى والأحدث للمراسلة الفورية</p>
+            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الأقوى للمراسلة الفورية</p>
         </div>
         <div class="tg-group" style="padding: 15px; gap: 12px;">
             <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (Username)..."></div>
@@ -187,7 +156,7 @@
             <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 13px; background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="openContactsModal()"><i class="fa-solid fa-address-book"></i> جهات الاتصال</button>
         </div>
         
-        <!-- شريط الستوريات الفعلي المتصل بقاعدة البيانات -->
+        <!-- شريط الستوريات العلوي -->
         <div class="stories-bar" id="storiesBar">
             <div class="story-item" onclick="triggerStoryUpload()">
                 <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
@@ -199,7 +168,7 @@
         <div class="content-body">
             <div class="input-box">
                 <i class="fa-solid fa-magnifying-glass" style="color: var(--tg-secondary);"></i>
-                <input type="text" id="searchFriendInput" placeholder="بحث عن يوزر أو صديق..." oninput="searchRealUser(this.value)">
+                <input type="text" id="searchFriendInput" placeholder="بحث عن يوزر صديق..." oninput="searchRealUser(this.value)">
             </div>
 
             <div id="friendsListView" style="display: flex; flex-direction: column; gap: 8px;">
@@ -208,7 +177,7 @@
                 </div>
             </div>
 
-            <!-- نافذة الشات الفعلي (مع نظام الحظر وإلغاء الحظر) -->
+            <!-- نافذة الشات الفعلي -->
             <div id="chatInterfaceView" class="tg-group" style="display: none; padding: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--tg-separator); padding-bottom: 8px;">
                     <div>
@@ -265,40 +234,13 @@
             </div>
             <div id="channelsContainer" style="display: flex; flex-direction: column; gap: 8px;">
                 <div class="tg-group" style="padding: 15px; text-align: center; color: var(--tg-secondary);">
-                    لا توجد قنوات مشتركة حالياً.
+                    لا توجد قنوات حالياً.
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- شاشة إدارة البوتات -->
-    <div class="app-screen" id="screenBotFather">
-        <div class="nav-bar">
-            <h1 class="nav-title">🤖 إدارة البوتات</h1>
-            <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="openCreateBotModal()">+ بوت جديد</button>
-        </div>
-        <div class="content-body">
-            <div class="tg-group" id="botCreateBox" style="padding: 15px; display: none; gap: 10px;">
-                <b>إنشاء بوت جديد</b>
-                <input type="text" id="newBotNameInput" class="input-box" placeholder="اسم البوت...">
-                <div style="display: flex; gap: 8px;">
-                    <button class="tg-btn" style="background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="document.getElementById('botCreateBox').style.display='none'">إلغاء</button>
-                    <button class="tg-btn" onclick="submitCreateBot()">الحصول على Token</button>
-                </div>
-            </div>
-            <div class="tg-group" style="padding: 12px; background: rgba(0,122,255,0.05);">
-                <b style="font-size: 13px; color: var(--tg-blue);">مركز المطورين</b>
-                <p style="font-size: 11px; color: var(--tg-secondary); margin-top: 4px;">أنشئ بوتاتك الخاصة واحصُل على الـ Token.</p>
-            </div>
-            <div id="myBotsListContainer" style="display: flex; flex-direction: column; gap: 8px;">
-                <div class="tg-group" style="padding: 15px; text-align: center; color: var(--tg-secondary); font-size: 13px;">
-                    لم تقم بإنشاء أي بوت بعد.
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- شاشة الملف الشخصي (تم إصلاح مشكلة الحفظ الفوري وتحديث الحقول) -->
+    <!-- شاشة الملف الشخصي -->
     <div class="app-screen" id="screenProfile">
         <div class="nav-bar"><h1 class="nav-title">الملف الشخصي</h1></div>
         <div class="content-body">
@@ -313,11 +255,11 @@
 
             <div class="tg-group">
                 <div class="tg-cell" style="flex-direction: column; align-items: stretch; gap: 8px;">
-                    <span style="font-size: 13px; color: var(--tg-secondary);">تعديل البيانات الشخصية واليوزر والصورة</span>
+                    <span style="font-size: 13px; color: var(--tg-secondary);">تعديل البيانات واليوزر والصورة</span>
                     <input type="text" id="editUsernameInput" class="input-box" placeholder="اليوزر الجديد...">
                     <input type="text" id="editNameInput" class="input-box" placeholder="الاسم الكامل...">
                     <input type="text" id="editBioInput" class="input-box" placeholder="النبذة الشخصية (Bio)...">
-                    <button class="tg-btn" style="padding: 10px; font-size: 14px;" onclick="updateUserProfile()">حفظ التعديلات في سومركرام</button>
+                    <button class="tg-btn" style="padding: 10px; font-size: 14px;" onclick="updateUserProfile()">حفظ التعديلات الفورية</button>
                 </div>
             </div>
         </div>
@@ -333,7 +275,7 @@
                     <span>رقم الهاتـف</span>
                     <span style="color: var(--tg-secondary); font-size: 14px;">+964 ••• ••••</span>
                 </div>
-                <div class="tg-cell tg-cell-action" onclick="switchTab(3, 'screenProfile')">
+                <div class="tg-cell tg-cell-action" onclick="switchTab(2, 'screenProfile')">
                     <span>اسم المستخدم (Username)</span>
                     <span id="settingsUsernameVal" style="color: var(--tg-blue); font-size: 14px;">@...</span>
                 </div>
@@ -374,13 +316,12 @@
         </div>
     </div>
 
-    <!-- شريط التنقل السفلي الثابت والمضبوط تماماً -->
+    <!-- شريط التنقل السفلي -->
     <div class="tab-bar" id="bottomTabBar" style="display: none;">
         <div class="tab-item active" onclick="switchTab(0, 'screenFriends')"><i class="fa-solid fa-comment-dots"></i><span>الرسائل</span></div>
         <div class="tab-item" onclick="switchTab(1, 'screenChannels')"><i class="fa-solid fa-bullhorn"></i><span>القنوات</span></div>
-        <div class="tab-item" onclick="switchTab(2, 'screenBotFather')"><i class="fa-solid fa-robot"></i><span>البوتات</span></div>
-        <div class="tab-item" onclick="switchTab(3, 'screenProfile')"><i class="fa-solid fa-user"></i><span>الملف</span></div>
-        <div class="tab-item" onclick="switchTab(4, 'screenSettings')"><i class="fa-solid fa-gear"></i><span>الإعدادات</span></div>
+        <div class="tab-item" onclick="switchTab(2, 'screenProfile')"><i class="fa-solid fa-user"></i><span>الملف</span></div>
+        <div class="tab-item" onclick="switchTab(3, 'screenSettings')"><i class="fa-solid fa-gear"></i><span>الإعدادات</span></div>
     </div>
 
 </div>
@@ -457,7 +398,6 @@
         enterMainApp();
     }
 
-    // إصلاح مشكلة حفظ وتحديث البروفايل الفوري
     async function updateUserProfile() {
         const newBio = document.getElementById('editBioInput').value.trim();
         const newName = document.getElementById('editNameInput').value.trim();
@@ -540,7 +480,7 @@
 
     async function openContactsModal() {
         document.getElementById('contactsModal').style.display = 'flex';
-        const { data } = await supabaseClient.from('profiles').select('username, full_name').limit(10);
+        const { data } = await supabaseClient.from('profiles').select('username, full_name').limit(15);
         const body = document.getElementById('contactsListBody');
         body.innerHTML = '';
         if(data) {
@@ -665,7 +605,6 @@
     async function sendSticker(url) {
         if(isBlocked) return;
         document.getElementById('stickerPicker').style.display = 'none';
-        await supabaseClient.storage.from('chat-media').upload();
         await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: url, type: 'sticker' }]);
     }
 
@@ -693,7 +632,6 @@
         } else { mediaRecorder.stop(); }
     }
 
-    // إدارة ونشر الستوريات الحقيقية
     function triggerStoryUpload() {
         document.getElementById('storyFileInput').click();
     }
@@ -714,12 +652,12 @@
         thumb.style.backgroundSize = 'cover';
         thumb.innerHTML = '';
         alert("✨ تم نشر قصتك (Story) بنجاح في سومركرام!");
+        await loadStories();
     }
 
     async function loadStories() {
         const { data } = await supabaseClient.from('profiles').select('username, story_url, avatar_url').not('story_url', 'is', null);
         const bar = document.getElementById('storiesBar');
-        // إبقاء زر قصتك أولاً
         let html = `
             <div class="story-item" onclick="triggerStoryUpload()">
                 <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
@@ -765,28 +703,6 @@
         document.getElementById('newChannelNameInput').value = '';
         document.getElementById('channelCreateBox').style.display = 'none';
         alert("تم إنشاء القناة بنجاح!");
-    }
-
-    function openCreateBotModal() {
-        document.getElementById('botCreateBox').style.display = 'flex';
-    }
-
-    function submitCreateBot() {
-        const botName = document.getElementById('newBotNameInput').value.trim();
-        if(!botName) return alert('أدخل اسم البوت');
-        const fakeToken = `${Math.floor(Math.random() * 899999999 + 100000000)}:AAH_${Math.random().toString(36).substring(7)}`;
-        const list = document.getElementById('myBotsListContainer');
-        if(list.innerHTML.includes('لم تقم بإنشاء')) list.innerHTML = '';
-
-        list.innerHTML += `
-            <div class="tg-group" style="padding: 14px; gap: 6px;">
-                <b>🤖 بوت: ${botName}</b>
-                <span style="font-size: 11px; color: var(--tg-secondary);">Token: <code style="color:var(--tg-blue);">${fakeToken}</code></span>
-                <span style="font-size: 11px; color: var(--tg-green);">● حالة البوت: يعمل بنجاح (Online)</span>
-            </div>`;
-        document.getElementById('newBotNameInput').value = '';
-        document.getElementById('botCreateBox').style.display = 'none';
-        alert("🎉 تم إنشاء البوت بنجاح والحصول على الـ Token!");
     }
 </script>
 
