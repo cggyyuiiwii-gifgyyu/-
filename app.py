@@ -5,7 +5,7 @@ import requests
 from flask import Flask, render_template_string, request, jsonify
 from PIL import Image, ImageDraw, ImageFont
 from telethon import TelegramClient, events
-from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButtonWebView, KeyboardButton
+from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButtonWebView
 
 API_ID = int(os.environ.get('API_ID', 1234567))
 API_HASH = os.environ.get('API_HASH', 'your_api_hash')
@@ -19,7 +19,6 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 
 client = TelegramClient('bot_session', API_ID, API_HASH)
 
-# تتبع بسيط للإحصائيات
 stats_data = {
     'total_packs': 0,
     'active_users': set()
@@ -49,7 +48,6 @@ def api_create_pack():
         
     safe_name = target_pack if (action_type == 'add' and target_pack) else f"{clean_title}_{user_id}_by_bot"
     
-    # مقاس أيقونة الحالة الدقيق في تليجرام 100x100 بكسل بخلفية شفافة تماماً
     size = (100, 100)
     image = Image.new("RGBA", size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -121,22 +119,18 @@ async def start(event):
     user_id = sender.id
     stats_data['active_users'].add(user_id)
     
-    # زر شفاف احترافي لفتح التطبيق المصغر للمستخدمين
+    # زر شفاف احترافي لفتح التطبيق المصغر حصراً بدون تداخل
     button_webapp = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
-    rows = [KeyboardButtonRow(buttons=[button_webapp])]
+    keyboard = ReplyInlineMarkup(rows=[KeyboardButtonRow(buttons=[button_webapp])])
     
-    # لو كان المستخدم هو المطور الأساسي، نضيف زر لوحة التحكم الخاصة به
+    welcome_text = "✨ أهلاً بك يا غالي في استوديو الأيقونات والحزم الشفافة بدقة 100x100!\nاضغط على الزر أدناه لفتح التطبيق وتصميم وتصدير حزمك مباشرة لتليجرام:"
+    
     if user_id == DEV_ID:
-        rows.append(KeyboardButtonRow(buttons=[KeyboardButton(text="⚙️ لوحة تحكم الأدمن")]))
+        welcome_text += "\n\n🛠 **مرحباً بك يا مطورنا!** يمكنك إرسال كلمة `لوحة الأدمن` لعرض الإحصائيات."
         
-    keyboard = ReplyInlineMarkup(rows=rows)
-    await event.respond(
-        "✨ أهلاً بك يا غالي في استوديو الأيقونات والحزم الشفافة بدقة 100x100!\n"
-        "اضغط على الزر أدناه لفتح التطبيق وتصميم وتصدير حزمك مباشرة لتليجرام:", 
-        buttons=keyboard
-    )
+    await event.respond(welcome_text, buttons=keyboard)
 
-@client.on(events.NewMessage(pattern='⚙️ لوحة تحكم الأدمن'))
+@client.on(events.NewMessage(pattern='لوحة الأدمن'))
 async def dev_panel(event):
     if event.sender_id != DEV_ID:
         return
@@ -148,26 +142,11 @@ async def dev_panel(event):
         f"• المستخدمين النشطين: `{len(stats_data['active_users'])}`\n"
         "• حالة النظام: `يعمل بكفاءة وسلاسة تامة 100%`"
     )
-    
-    # أزرار لوحة تحكم المطور النظيفة
-    keyboard = ReplyInlineMarkup(rows=[
-        KeyboardButtonRow(buttons=[KeyboardButton(text="📊 تحديث الإحصائيات"), KeyboardButton(text="🔙 العودة للرئيسية")])
-    ])
-    await event.respond(panel_text, buttons=keyboard)
-
-@client.on(events.NewMessage(pattern='📊 تحديث الإحصائيات'))
-async def refresh_stats(event):
-    if event.sender_id != DEV_ID:
-        return
-    await dev_panel(event)
-
-@client.on(events.NewMessage(pattern='🔙 العودة للرئيسية'))
-async def back_home(event):
-    await start(event)
+    await event.respond(panel_text)
 
 async def main():
     await client.start(bot_token=BOT_TOKEN)
-    print("🤖 بوت استوديو الملصقات ولوحة تحكم المطور يعملان بكفاءة تامة...")
+    print("🤖 بوت استوديو الملصقات يعمل بكفاءة تامة...")
     await client.run_until_disconnected()
 
 if __name__ == '__main__':
