@@ -42,12 +42,6 @@ def api_create_pack():
     action_type = data.get('action_type', 'new')
     target_pack = data.get('target_pack', '')
 
-    clean_title = re.sub(r'[^a-zA-Z0-9]', '', raw_title).lower()
-    if not clean_title:
-        clean_title = "vipsticker"
-        
-    safe_name = target_pack if (action_type == 'add' and target_pack) else f"{clean_title}_{user_id}_by_bot"
-    
     size = (100, 100)
     image = Image.new("RGBA", size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -67,51 +61,57 @@ def api_create_pack():
     draw.text((x + 2, y + 2), text, font=font, fill=(0, 0, 0, 200))
     draw.text((x, y), text, font=font, fill=color)
     
-    file_path = os.path.join(TEMP_DIR, f"{safe_name}_{os.urandom(2).hex()}.png")
+    temp_file_name = f"sticker_{user_id}_{os.urandom(3).hex()}.png"
+    file_path = os.path.join(TEMP_DIR, temp_file_name)
     image.save(file_path, "PNG", optimize=True)
     
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return jsonify({'status': 'error', 'error': 'فشل حفظ ملف الصورة محلياً'})
 
-    if action_type == 'add':
+    if action_type == 'add' and target_pack:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/addStickerToSet"
         with open(file_path, 'rb') as sticker_file:
-            files = {'png_sticker': (os.path.basename(file_path), sticker_file, 'image/png')}
+            files = {'png_sticker': (temp_file_name, sticker_file, 'image/png')}
             payload = {
                 'user_id': user_id,
-                'name': safe_name,
+                'name': target_pack,
                 'emoji_list': ['👑']
             }
             response = requests.post(url, data=payload, files=files)
             res_json = response.json()
     else:
+        # استخدام اللاحقة المطابقة ليوزر بوتك ddawebot بنجاح تام
+        safe_name = f"v{user_id}{os.urandom(3).hex()}_by_ddawebot".lower()
+        
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/createNewStickerSet"
         with open(file_path, 'rb') as sticker_file:
-            files = {'png_sticker': (os.path.basename(file_path), sticker_file, 'image/png')}
+            files = {'png_sticker': (temp_file_name, sticker_file, 'image/png')}
             payload = {
                 'user_id': user_id,
                 'name': safe_name,
-                'title': raw_title,
+                'title': raw_title if raw_title else 'VIP Pack',
                 'sticker_format': 'static',
                 'emojis': '👑'
             }
             response = requests.post(url, data=payload, files=files)
             res_json = response.json()
             
+            # محاولة احتياطية ثانية بترك الاسم فارغاً ليتولاه تليجرام تلقائياً إذا حدث أي تعارض
             if not res_json.get('ok'):
-                safe_name = f"pack{user_id}{os.urandom(3).hex()}bybot"
-                payload['name'] = safe_name
+                payload['name'] = ""
                 with open(file_path, 'rb') as retry_file:
-                    retry_files = {'png_sticker': (os.path.basename(file_path), retry_file, 'image/png')}
+                    retry_files = {'png_sticker': (temp_file_name, retry_file, 'image/png')}
                     response = requests.post(url, data=payload, files=retry_files)
                     res_json = response.json()
+                    safe_name = res_json.get('result', {}).get('name', safe_name)
     
     if res_json.get('ok'):
         stats_data['total_packs'] += 1
         pack_link = f"https://t.me/addstickers/{safe_name}"
         return jsonify({'status': 'success', 'pack_link': pack_link, 'pack_name': safe_name})
     else:
-        return jsonify({'status': 'error', 'error': res_json.get('description', 'خطأ غير معروف من تليجرام')})
+        err_desc = res_json.get('description', 'خطأ غير معروف')
+        return jsonify({'status': 'error', 'error': err_desc})
 
 @client.on(events.NewMessage(pattern='/start'))
 async def start(event):
@@ -119,7 +119,6 @@ async def start(event):
     user_id = sender.id
     stats_data['active_users'].add(user_id)
     
-    # زر شفاف احترافي لفتح التطبيق المصغر حصراً بدون تداخل
     button_webapp = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
     keyboard = ReplyInlineMarkup(rows=[KeyboardButtonRow(buttons=[button_webapp])])
     
