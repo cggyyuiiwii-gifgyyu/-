@@ -8,7 +8,9 @@ from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButt
 API_ID = int(os.environ.get('API_ID', 1234567))
 API_HASH = os.environ.get('API_HASH', 'your_api_hash')
 BOT_TOKEN = os.environ.get('BOT_TOKEN', 'your_bot_token')
-MINI_APP_URL = os.environ.get('MINI_APP_URL', 'https://daring-encouragement-production-3257.up.railway.app')
+
+# تثبيت رابط الاستضافة الحقيقي مباشرة لمنع أي خطأ في الأزرار
+MINI_APP_URL = "https://daring-encouragement-production-3257.up.railway.app"
 
 app = Flask(__name__)
 TEMP_DIR = 'temp_badges'
@@ -31,7 +33,7 @@ def api_create_pack():
     color = data.get('color', '#FFFFFF')
     pack_name = data.get('pack_name', 'VIP_Status_Pack')
     
-    # مقاس أيقونة الحالة الدقيق في تليجرام هو 100x100 بكسل بخلفية شفافة
+    # مقاس أيقونة الحالة الدقيق في تليجرام هو 100x100 بكسل بخلفية شفافة تماماً
     size = (100, 100)
     image = Image.new("RGBA", size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
