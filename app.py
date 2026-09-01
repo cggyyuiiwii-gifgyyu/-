@@ -8,7 +8,7 @@ from telethon.tl.types import ReplyInlineMarkup, KeyboardButtonRow, KeyboardButt
 API_ID = int(os.environ.get('API_ID', 1234567))
 API_HASH = os.environ.get('API_HASH', 'your_api_hash')
 BOT_TOKEN = os.environ.get('BOT_TOKEN', 'your_bot_token')
-MINI_APP_URL = os.environ.get('MINI_APP_URL', 'https://your-app.up.railway.app')
+MINI_APP_URL = os.environ.get('MINI_APP_URL', 'https://daring-encouragement-production-3257.up.railway.app')
 
 app = Flask(__name__)
 TEMP_DIR = 'temp_badges'
@@ -31,9 +31,9 @@ def api_create_pack():
     color = data.get('color', '#FFFFFF')
     pack_name = data.get('pack_name', 'VIP_Status_Pack')
     
-    # مقاس أيقونة الحالة الدقيق في تليجرام هو 100x100 بكسل
+    # مقاس أيقونة الحالة الدقيق في تليجرام هو 100x100 بكسل بخلفية شفافة
     size = (100, 100)
-    image = Image.new("RGBA", size, (0, 0, 0, 0)) # خلفية شفافة بالكامل
+    image = Image.new("RGBA", size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
     
     try:
@@ -64,7 +64,6 @@ def api_create_pack():
 
 @client.on(events.NewMessage(pattern='/start'))
 async def start(event):
-    # استخدام الأزرار الشفافة (Inline Keyboard) مع زر فتح التطبيق المصغر بنجاح
     button = KeyboardButtonWebView(text="👑 فتح استوديو أيقونات الحالة المميزة", url=MINI_APP_URL)
     keyboard = ReplyInlineMarkup(rows=[KeyboardButtonRow(buttons=[button])])
     await event.respond("✨ أهلاً بك يا غالي! اضغط على الزر أدناه لفتح التطبيق المصغر وتصميم أيقونتك الشفافة الخاصة بالمشتركين المميزين:", buttons=keyboard)
@@ -77,5 +76,10 @@ async def main():
 if __name__ == '__main__':
     import threading
     port = int(os.environ.get('PORT', 8080))
-    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=port, debug=False)).start()
+    
+    # تشغيل سيرفر Flask في خيوط خلفية مستقلة لضمان استجابة البوت للأوامر
+    flask_thread = threading.Thread(target=lambda: app.run(host='0.0.0.0', port=port, debug=False))
+    flask_thread.daemon = True
+    flask_thread.start()
+    
     asyncio.run(main())
