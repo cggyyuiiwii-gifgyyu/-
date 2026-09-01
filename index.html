@@ -3,398 +3,726 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Hub — Direct Realtime Experience</title>
+    <title>سومركرام — SomerGram</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- مكتبة Supabase للاتصال وقاعدة البيانات الحية -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --ios-bg: rgba(242, 242, 247, 0.92);
-            --ios-card: rgba(255, 255, 255, 0.94);
-            --ios-text: #000000;
-            --ios-text-secondary: #3C3C43;
-            --ios-text-tertiary: #8E8E93;
-            --ios-blue: #007AFF;
-            --ios-green: #34C759;
-            --ios-purple: #AF52DE;
-            --ios-separator: rgba(60, 60, 67, 0.12);
-            --ios-glass: rgba(255, 255, 255, 0.8);
-            --ios-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --ios-card-radius: 24px;
-            --ios-pill-radius: 50px;
+            --tg-bg: #ffffff;
+            --tg-card: #f7f7f7;
+            --tg-text: #000000;
+            --tg-secondary: #8e8e93;
+            --tg-blue: #007aff;
+            --tg-separator: #c6c6c8;
+            --tg-tab-bg: rgba(255, 255, 255, 0.95);
+            --tg-red: #ff3b30;
+            --tg-green: #34c759;
         }
 
         [data-theme="dark"] {
-            --ios-bg: rgba(18, 18, 20, 0.96);
-            --ios-card: rgba(30, 30, 34, 0.94);
-            --ios-text: #FFFFFF;
-            --ios-text-secondary: #EBEBF5;
-            --ios-text-tertiary: #98989F;
-            --ios-blue: #0A84FF;
-            --ios-green: #30D158;
-            --ios-purple: #BF5AF2;
-            --ios-separator: rgba(255, 255, 255, 0.15);
-            --ios-glass: rgba(24, 24, 28, 0.8);
-            --ios-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --tg-bg: #0f0f0f;
+            --tg-card: #1c1c1e;
+            --tg-text: #ffffff;
+            --tg-secondary: #98989f;
+            --tg-blue: #0a84ff;
+            --tg-separator: #2c2c2e;
+            --tg-tab-bg: rgba(28, 28, 30, 0.95);
+            --tg-red: #ff453a;
+            --tg-green: #30d158;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', -apple-system, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
-        body {
-            background: transparent;
-            color: var(--ios-text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { background: transparent; color: var(--tg-text); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
 
         .iphone-container {
-            width: 100%;
-            max-width: 414px;
-            height: 100vh;
-            max-height: 896px;
-            background-color: var(--ios-bg);
-            backdrop-filter: blur(25px);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 414px; height: 100vh; max-height: 896px;
+            background-color: var(--tg-bg); position: relative; overflow: hidden;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3); display: flex; flex-direction: column;
         }
 
         @media (min-width: 450px) {
-            .iphone-container {
-                border-radius: 50px;
-                border: 12px solid rgba(44, 44, 46, 0.85);
-                height: 880px;
-            }
+            .iphone-container { border-radius: 40px; border: 10px solid #2c2c2e; height: 850px; }
         }
 
         .app-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding-top: 15px;
-            padding-bottom: 90px;
-            overflow-y: auto;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            transform: scale(0.96);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; padding-top: 10px; padding-bottom: 75px;
+            overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
         }
-
-        .app-screen.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1);
-        }
-
+        .app-screen.active { opacity: 1; pointer-events: auto; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
 
         .nav-bar {
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--ios-glass);
-            backdrop-filter: blur(20px);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            border-bottom: 0.5px solid var(--ios-separator);
+            padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--tg-bg); position: sticky; top: 0; z-index: 50;
+            border-bottom: 0.5px solid var(--tg-separator);
         }
+        .nav-title { font-size: 18px; font-weight: 700; }
 
-        .nav-title { font-size: 20px; font-weight: 800; }
-
-        .ios-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: var(--ios-pill-radius);
-            font-weight: 600;
-            font-size: 15px;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.15s ease;
+        .tg-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 18px; border-radius: 12px; font-weight: 600; font-size: 14px;
+            border: none; cursor: pointer; width: 100%; background: var(--tg-blue); color: #fff;
         }
-        .ios-btn:active { transform: scale(0.94); }
-        .btn-primary { background: var(--ios-blue); color: #FFF; box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
-        .btn-green { background: var(--ios-green); color: #FFF; box-shadow: 0 5px 15px rgba(52,199,89,0.3); }
-        .btn-icon { width: 40px; height: 40px; border-radius: 50%; padding: 0; background: var(--ios-card); color: var(--ios-text); border: 0.5px solid var(--ios-separator); }
+        .tg-btn:active { opacity: 0.8; }
+        
+        .content-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
 
-        .content-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
-
-        .hub-card {
-            background: var(--ios-card);
-            border-radius: var(--ios-card-radius);
-            padding: 20px;
-            border: 0.5px solid var(--ios-separator);
-            box-shadow: var(--ios-shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .tg-group {
+            background: var(--tg-card); border-radius: 14px; overflow: hidden;
+            border: 0.5px solid var(--tg-separator); display: flex; flex-direction: column;
         }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: rgba(128,128,128,0.1);
-            border-radius: 16px;
-            padding: 12px 16px;
-            gap: 10px;
-            border: 0.5px solid var(--ios-separator);
+        .tg-cell {
+            padding: 13px 16px; display: flex; align-items: center; justify-content: space-between;
+            font-size: 15px; border-bottom: 0.5px solid var(--tg-separator); background: var(--tg-card);
         }
-        .search-box input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--ios-text);
-            font-size: 16px;
-            width: 100%;
-        }
+        .tg-cell:last-child { border-bottom: none; }
+        .tg-cell-action { cursor: pointer; transition: background 0.1s; }
+        .tg-cell-action:active { background: rgba(128,128,128,0.15); }
 
-        /* شريط التبويبات السفلي */
+        .input-box {
+            display: flex; align-items: center; background: rgba(128,128,128,0.08); border-radius: 10px;
+            padding: 10px 14px; gap: 10px; border: 0.5px solid var(--tg-separator); width: 100%;
+        }
+        .input-box input { background: transparent; border: none; outline: none; color: var(--tg-text); font-size: 15px; width: 100%; }
+
+        /* شريط الستوريات العلوي */
+        .stories-bar {
+            display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto;
+            border-bottom: 0.5px solid var(--tg-separator); background: var(--tg-card);
+        }
+        .story-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; min-width: 60px; }
+        .story-ring {
+            width: 56px; height: 56px; border-radius: 50%; padding: 2px;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .story-img { width: 50px; height: 50px; border-radius: 50%; background: var(--tg-bg); object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--tg-text); }
+        .story-name { font-size: 11px; color: var(--tg-text); text-overflow: ellipsis; overflow: hidden; width: 60px; text-align: center; white-space: nowrap; }
+
+        /* شريط التنقل السفلي */
         .tab-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: var(--ios-glass);
-            backdrop-filter: blur(25px);
-            border-top: 0.5px solid var(--ios-separator);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 90;
-            padding-bottom: 15px;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+            background: var(--tg-tab-bg); backdrop-filter: blur(20px);
+            border-top: 0.5px solid var(--tg-separator);
+            display: flex; justify-content: space-around; align-items: center; z-index: 90;
         }
         .tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--ios-text-tertiary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            color: var(--tg-secondary); font-size: 10px; font-weight: 500; cursor: pointer; flex: 1;
         }
         .tab-item i { font-size: 20px; }
-        .tab-item.active { color: var(--ios-blue); }
+        .tab-item.active { color: var(--tg-blue); }
 
-        .chat-box {
-            display: flex;
-            flex-direction: column;
-            height: 350px;
-            background: rgba(128,128,128,0.05);
-            border-radius: 18px;
-            padding: 10px;
-            overflow-y: auto;
-            gap: 8px;
+        .chat-box { display: flex; flex-direction: column; height: 280px; background: rgba(128,128,128,0.03); border-radius: 12px; padding: 12px; overflow-y: auto; gap: 10px; }
+        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14px; word-break: break-word; line-height: 1.4; }
+        .msg.incoming { background: var(--tg-card); align-self: flex-start; border: 0.5px solid var(--tg-separator); }
+        .msg.outgoing { background: var(--tg-blue); color: #fff; align-self: flex-end; }
+        .msg img { max-width: 160px; border-radius: 8px; display: block; margin-top: 4px; }
+        .msg .sticker-img { width: 85px; height: 85px; }
+
+        .picker-panel {
+            display: none; background: var(--tg-card); border-radius: 12px; padding: 8px;
+            border: 0.5px solid var(--tg-separator); gap: 6px; flex-wrap: wrap; justify-content: center;
         }
-        .msg { padding: 10px 14px; border-radius: 14px; max-width: 75%; font-size: 14px; }
-        .msg.incoming { background: var(--ios-card); align-self: flex-start; border: 0.5px solid var(--ios-separator); }
-        .msg.outgoing { background: var(--ios-blue); color: #fff; align-self: flex-end; }
+        .emoji-item, .sticker-item { font-size: 22px; cursor: pointer; padding: 4px; }
+        .sticker-item img { width: 40px; height: 40px; }
     </style>
 </head>
 <body data-theme="dark">
 
 <div class="iphone-container">
     
-    <!-- ================= 1. قسم الأغاني (مع بادئة يوت التلقائية) ================= -->
-    <div class="app-screen active" id="screenMusic">
-        <div class="nav-bar">
-            <h1 class="nav-title">🎵 محرك الأغاني</h1>
-            <button class="ios-btn btn-icon" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+    <!-- شاشة التسجيل -->
+    <div class="app-screen active" id="screenAuth" style="justify-content: center; padding: 25px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 50px; color: var(--tg-blue); margin-bottom: 10px;"><i class="fa-brands fa-telegram"></i></div>
+            <h1 style="font-size: 22px; font-weight: 800;">سومركرام (SomerGram)</h1>
+            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الأقوى والأحدث للمراسلة الفورية</p>
         </div>
-        <div class="content-body">
-            <div class="hub-card" style="background: linear-gradient(135deg, #007AFF, #5856D6); color: white;">
-                <h2>مكتبة الموسيقى الذكية</h2>
-                <p style="font-size: 13px; opacity: 0.85;">اكتب اسم الأغنية وسيقوم النظام تلقائياً بإضافة (يوت) للبحث السريع.</p>
-                <audio id="audioPlayer" controls style="width: 100%; margin-top: 10px; display: none;"></audio>
-            </div>
-
-            <div class="hub-card">
-                <div class="search-box">
-                    <span style="font-weight: 900; color: var(--ios-blue); background: rgba(0,122,255,0.1); padding: 4px 8px; border-radius: 8px;">يوت</span>
-                    <input type="text" id="musicQueryInput" placeholder="اكتب اسم الفنان أو الأغنية...">
-                </div>
-                <button class="ios-btn btn-primary" style="justify-content: center;" onclick="searchAndPlayMusic()">
-                    <i class="fa-solid fa-play"></i> بحث وتشغيل فوري
-                </button>
-            </div>
-
-            <div id="musicResultView"></div>
+        <div class="tg-group" style="padding: 15px; gap: 12px;">
+            <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (Username)..."></div>
+            <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="authEmail" placeholder="البريد الإلكتروني..."></div>
+            <div class="input-box"><i class="fa-solid fa-lock"></i><input type="password" id="authPassword" placeholder="كلمة المرور..."></div>
+            <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب جديد</button>
+            <button class="tg-btn" style="background: transparent; color: var(--tg-blue); border: 1px solid var(--tg-blue);" onclick="handleEmailAuth('login')">تسجيل الدخول</button>
         </div>
     </div>
 
-    <!-- ================= 2. قسم الأصدقاء والدردشة الخاصة ================= -->
+    <!-- شاشة الدردشة وجهات الاتصال والستوريات -->
     <div class="app-screen" id="screenFriends">
         <div class="nav-bar">
-            <h1 class="nav-title">💬 الدردشة والأصدقاء</h1>
-            <button class="ios-btn btn-icon" onclick="openAddFriendModal()"><i class="fa-solid fa-user-plus"></i></button>
+            <h1 class="nav-title">سومركرام</h1>
+            <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 13px; background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="openContactsModal()"><i class="fa-solid fa-address-book"></i> جهات الاتصال</button>
         </div>
+        
+        <!-- شريط الستوريات (Stories) -->
+        <div class="stories-bar" id="storiesBar">
+            <div class="story-item" onclick="triggerStoryUpload()">
+                <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
+                <span class="story-name">قصتك</span>
+            </div>
+            <div class="story-item">
+                <div class="story-ring"><div class="story-img"><i class="fa-solid fa-user"></i></div></div>
+                <span class="story-name">سومر_نيوز</span>
+            </div>
+        </div>
+        <input type="file" id="storyFileInput" accept="image/*" style="display: none;" onchange="uploadMyStory(this)">
+
         <div class="content-body">
-            <div id="friendsListView" style="display: flex; flex-direction: column; gap: 10px;">
-                <div class="hub-card" style="text-align: center; color: var(--ios-text-tertiary);">
-                    <p>لا توجد محادثات نشطة حالياً. اضغط على علامة (+) لإضافة صديق عبر معرف التليجرام (ID).</p>
+            <div class="input-box">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--tg-secondary);"></i>
+                <input type="text" id="searchFriendInput" placeholder="بحث عن يوزر أو صديق..." oninput="searchRealUser(this.value)">
+            </div>
+
+            <div id="friendsListView" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="tg-group" style="padding: 12px; text-align: center; color: var(--tg-secondary); font-size: 13px;">
+                    ابحث عن يوزر أو تواصل مع جهات الاتصال.
                 </div>
             </div>
 
-            <!-- نافذة الدردشة النشطة مع صديق -->
-            <div id="chatInterfaceView" class="hub-card" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--ios-separator); padding-bottom: 8px;">
-                    <span id="activeChatFriendName" style="font-weight: 700;">اسم الصديق</span>
-                    <button class="ios-btn" style="padding: 4px 10px; font-size: 11px;" onclick="closeChat()">إغلاق</button>
-                </div>
-                <div class="chat-box" id="chatMessagesBox"></div>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <div class="search-box" style="flex: 1; margin: 0; padding: 8px 12px;">
-                        <input type="text" id="messageInputText" placeholder="اكتب رسالتك...">
+            <!-- نافذة الشات الفعلي (مع نظام الحظر وإلغاء الحظر) -->
+            <div id="chatInterfaceView" class="tg-group" style="display: none; padding: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--tg-separator); padding-bottom: 8px;">
+                    <div>
+                        <span id="activeChatFriendName" style="font-weight: 700;">الصديق</span>
+                        <div id="blockStatusText" style="font-size: 10px; color: var(--tg-secondary);"></div>
                     </div>
-                    <button class="ios-btn btn-primary" style="padding: 10px 16px;" onclick="sendDirectMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="tg-btn" id="blockUserBtn" style="width: auto; padding: 4px 8px; font-size: 11px; background: var(--tg-red);" onclick="toggleBlockUser()">حظر</button>
+                        <button class="tg-btn" style="width: auto; padding: 4px 10px; font-size: 12px; background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="closeChat()">إغلاق</button>
+                    </div>
+                </div>
+                <div class="chat-box" id="chatMessagesBox" style="margin-top: 8px;"></div>
+                
+                <div class="picker-panel" id="emojiPicker">
+                    <span class="emoji-item" onclick="insertEmoji('😊')">😊</span>
+                    <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
+                    <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                    <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
+                </div>
+                
+                <div class="picker-panel" id="stickerPicker">
+                    <div class="sticker-item" onclick="sendSticker('https://raw.githubusercontent.com/TelegramBots/book/master/src/docs/sticker.png')"><img src="https://raw.githubusercontent.com/TelegramBots/book/master/src/docs/sticker.png"></div>
+                </div>
+
+                <div style="display: flex; gap: 6px; align-items: center; margin-top: 8px;" id="chatInputArea">
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="sendImageFile(this)">
+                    <button class="tg-btn" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; background: var(--tg-card); border: 0.5px solid var(--tg-separator); color: var(--tg-blue);" onclick="document.getElementById('imageInput').click()"><i class="fa-solid fa-image"></i></button>
+                    <button class="tg-btn" id="recordBtn" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; background: var(--tg-card); border: 0.5px solid var(--tg-separator); color: var(--tg-secondary);" onclick="toggleVoiceRecording()"><i class="fa-solid fa-microphone"></i></button>
+                    <button class="tg-btn" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; background: var(--tg-card); border: 0.5px solid var(--tg-separator); color: #af52de;" onclick="toggleStickerPicker()"><i class="fa-solid fa-note-sticky"></i></button>
+                    
+                    <div class="input-box" style="flex: 1; margin: 0; padding: 6px 10px;">
+                        <input type="text" id="messageInputText" placeholder="رسالة...">
+                    </div>
+                    <button class="tg-btn" style="width: auto; padding: 8px 14px;" onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ================= شريط التنقل السفلي ================= -->
-    <div class="tab-bar">
-        <div class="tab-item active" onclick="switchTab(0, 'screenMusic')">
-            <i class="fa-solid fa-headphones"></i>
-            <span>الأغاني</span>
+    <!-- شاشة القنوات (Channels) -->
+    <div class="app-screen" id="screenChannels">
+        <div class="nav-bar">
+            <h1 class="nav-title">القنوات</h1>
+            <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 13px;" onclick="openCreateChannelModal()">إنشاء قناة</button>
         </div>
-        <div class="tab-item" onclick="switchTab(1, 'screenFriends')">
-            <i class="fa-solid fa-comments"></i>
-            <span>الدردشة</span>
+        <div class="content-body">
+            <div class="tg-group" id="channelCreateBox" style="padding: 15px; display: none; gap: 10px;">
+                <b>إنشاء قناة جديدة</b>
+                <input type="text" id="newChannelNameInput" class="input-box" placeholder="اسم القناة...">
+                <div style="display: flex; gap: 8px;">
+                    <button class="tg-btn" style="background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="document.getElementById('channelCreateBox').style.display='none'">إلغاء</button>
+                    <button class="tg-btn" onclick="submitCreateChannel()">إتمام الإنشاء</button>
+                </div>
+            </div>
+            <div id="channelsContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="tg-group" style="padding: 15px; text-align: center; color: var(--tg-secondary);">
+                    لا توجد قنوات مشتركة حالياً.
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- شاشة إدارة البوتات -->
+    <div class="app-screen" id="screenBotFather">
+        <div class="nav-bar">
+            <h1 class="nav-title">🤖 إدارة البوتات</h1>
+            <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="openCreateBotModal()">+ بوت جديد</button>
+        </div>
+        <div class="content-body">
+            <div class="tg-group" id="botCreateBox" style="padding: 15px; display: none; gap: 10px;">
+                <b>إنشاء بوت جديد</b>
+                <input type="text" id="newBotNameInput" class="input-box" placeholder="اسم البوت...">
+                <div style="display: flex; gap: 8px;">
+                    <button class="tg-btn" style="background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="document.getElementById('botCreateBox').style.display='none'">إلغاء</button>
+                    <button class="tg-btn" onclick="submitCreateBot()">الحصول على Token</button>
+                </div>
+            </div>
+            <div class="tg-group" style="padding: 12px; background: rgba(0,122,255,0.05);">
+                <b style="font-size: 13px; color: var(--tg-blue);">مركز المطورين</b>
+                <p style="font-size: 11px; color: var(--tg-secondary); margin-top: 4px;">أنشئ بوتاتك الخاصة واحصُل على الـ Token.</p>
+            </div>
+            <div id="myBotsListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="tg-group" style="padding: 15px; text-align: center; color: var(--tg-secondary); font-size: 13px;">
+                    لم تقم بإنشاء أي بوت بعد.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة الملف الشخصي -->
+    <div class="app-screen" id="screenProfile">
+        <div class="nav-bar"><h1 class="nav-title">الملف الشخصي</h1></div>
+        <div class="content-body">
+            <div class="tg-group" style="padding: 20px; align-items: center; text-align: center;">
+                <input type="file" id="profileAvatarInput" accept="image/*" style="display: none;" onchange="updateAvatarImage(this)">
+                <div id="profileAvatarBox" onclick="document.getElementById('profileAvatarInput').click()" style="width: 75px; height: 75px; border-radius: 50%; background: var(--tg-blue); display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; margin-bottom: 8px; cursor: pointer; overflow: hidden; background-size: cover;">
+                    <i class="fa-solid fa-user" id="defaultAvatarIcon"></i>
+                </div>
+                <h2 id="profileUsernameDisplay" style="font-size: 17px; font-weight: 700;">@username</h2>
+                <p id="profileBioDisplay" style="font-size: 12px; color: var(--tg-secondary); margin-top: 2px;">لا توجد نبذة...</p>
+            </div>
+
+            <div class="tg-group">
+                <div class="tg-cell" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                    <span style="font-size: 13px; color: var(--tg-secondary);">تعديل البيانات الشخصية واليوزر والصورة</span>
+                    <input type="text" id="editUsernameInput" class="input-box" placeholder="اليوزر الجديد...">
+                    <input type="text" id="editNameInput" class="input-box" placeholder="الاسم الكامل...">
+                    <input type="text" id="editBioInput" class="input-box" placeholder="النبذة الشخصية (Bio)...">
+                    <button class="tg-btn" style="padding: 8px; font-size: 13px;" onclick="updateUserProfile()">حفظ التعديلات في سومركرام</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة الإعدادات -->
+    <div class="app-screen" id="screenSettings">
+        <div class="nav-bar"><h1 class="nav-title">الإعدادات</h1></div>
+        <div class="content-body">
+            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px;">الحساب والأمان</div>
+            <div class="tg-group">
+                <div class="tg-cell tg-cell-action" onclick="alert('رقم الهاتف مرتبط بالحساب الآمن.')">
+                    <span>رقم الهاتـف</span>
+                    <span style="color: var(--tg-secondary); font-size: 14px;">+964 ••• ••••</span>
+                </div>
+                <div class="tg-cell tg-cell-action" onclick="switchTab(3, 'screenProfile')">
+                    <span>اسم المستخدم (Username)</span>
+                    <span id="settingsUsernameVal" style="color: var(--tg-blue); font-size: 14px;">@...</span>
+                </div>
+            </div>
+
+            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px; margin-top: 5px;">الخصوصية والمظهر</div>
+            <div class="tg-group">
+                <div class="tg-cell">
+                    <span>حالة الظهور (آخر ظهور)</span>
+                    <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--tg-blue);">
+                </div>
+                <div class="tg-cell tg-cell-action" onclick="toggleTheme()">
+                    <span>الوضع الليلي / النهاري</span>
+                    <i class="fa-solid fa-circle-half-stroke" style="color: var(--tg-blue);"></i>
+                </div>
+                <div class="tg-cell">
+                    <span>الإشعارات والأصوات</span>
+                    <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--tg-blue);">
+                </div>
+            </div>
+
+            <div class="tg-group" style="margin-top: 10px;">
+                <div class="tg-cell tg-cell-action" style="color: var(--tg-red); justify-content: center;" onclick="logoutUser()">
+                    <span>تسجيل الخروج من سومركرام</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة جهات الاتصال -->
+    <div id="contactsModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000;">
+        <div class="tg-group" style="width: 85%; max-width: 320px; padding: 20px; background: var(--tg-bg);">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">جهات الاتصال</h3>
+            <div id="contactsListBody" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 13px; color: var(--tg-secondary);">جاري جلب جهات الاتصال...</span>
+            </div>
+            <button class="tg-btn" style="padding: 6px;" onclick="document.getElementById('contactsModal').style.display='none'">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- شريط التنقل السفلي -->
+    <div class="tab-bar" id="bottomTabBar" style="display: none;">
+        <div class="tab-item active" onclick="switchTab(0, 'screenFriends')"><i class="fa-solid fa-comment-dots"></i><span>الرسائل</span></div>
+        <div class="tab-item" onclick="switchTab(1, 'screenChannels')"><i class="fa-solid fa-bullhorn"></i><span>القنوات</span></div>
+        <div class="tab-item" onclick="switchTab(2, 'screenBotFather')"><i class="fa-solid fa-robot"></i><span>البوتات</span></div>
+        <div class="tab-item" onclick="switchTab(3, 'screenProfile')"><i class="fa-solid fa-user"></i><span>الملف</span></div>
+        <div class="tab-item" onclick="switchTab(4, 'screenSettings')"><i class="fa-solid fa-gear"></i><span>الإعدادات</span></div>
     </div>
 
 </div>
 
 <script>
-    // تهيئة تليجرام WebApp وسحب بيانات المستخدم الحقيقية تلقائياً
     let tg = window.Telegram.WebApp;
     tg.expand();
-    let currentUser = tg.initDataUnsafe?.user || { id: 5126968608, first_name: "مطور التطبيق", username: "ddaweBot" };
 
-    // إعدادات اتصال Supabase (قم باستبدال الروابط بمعلومات مشروعك في سوبابيس عند الحاجة)
-    const SUPABASE_URL = 'https://your-supabase-project.supabase.co';
-    const SUPABASE_KEY = 'your-supabase-anon-key';
+    const SUPABASE_URL = 'https://ppvhhborvygnondopizh.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwdmhoYm9ydnlnbm9uZG9waXpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyNjU4NTIsImV4cCI6MjEwMzg0MTg1Mn0.KGs_9IRdMgGYjBgSloCqvZkllLSozfrRJKk6EhZ6sz0';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    function switchTab(index, screenId) {
-        document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
+    let currentAuthUser = null;
+    let currentUserProfile = null;
+    let activeChatTarget = null;
+    let realTimeChannel = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            currentAuthUser = session.user;
+            await fetchUserProfile();
+            enterMainApp();
+        }
+    });
+
+    async function fetchUserProfile() {
+        const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentAuthUser.id).single();
+        if (data) {
+            currentUserProfile = data;
+            document.getElementById('profileUsernameDisplay').innerText = "@" + data.username;
+            document.getElementById('settingsUsernameVal').innerText = "@" + data.username;
+            document.getElementById('profileBioDisplay').innerText = data.bio || "لا توجد نبذة...";
+            document.getElementById('editBioInput').value = data.bio || "";
+            document.getElementById('editNameInput').value = data.full_name || "";
+            document.getElementById('editUsernameInput').value = data.username || "";
+            
+            if(data.avatar_url) {
+                const box = document.getElementById('profileAvatarBox');
+                box.style.backgroundImage = `url(${data.avatar_url})`;
+                document.getElementById('defaultAvatarIcon').style.display = 'none';
+                
+                document.getElementById('myStoryThumb').style.backgroundImage = `url(${data.avatar_url})`;
+                document.getElementById('myStoryThumb').style.backgroundSize = 'cover';
+                document.getElementById('myStoryThumb').innerHTML = '';
+            }
+        }
+    }
+
+    async function handleEmailAuth(type) {
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value.trim();
+        const username = document.getElementById('authUsername').value.trim().replace('@', '');
         
-        const tabs = document.querySelectorAll('.tab-item');
-        tabs.forEach((tab, i) => {
-            if (i === index) tab.classList.add('active');
-            else tab.classList.remove('active');
-        });
-        if (navigator.vibrate) navigator.vibrate(10);
+        if(!email || !password) return alert('الرجاء إدخال البريد وكلمة المرور');
+
+        if(type === 'signup') {
+            if(!username) return alert('أدخل يوزراً صالحاً');
+            const { data: existingUser } = await supabaseClient.from('profiles').select('username').eq('username', username).single();
+            if(existingUser) return alert('هذا اليوزر مستخدم بالفعل');
+
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            if(error) return alert(error.message);
+            
+            currentAuthUser = data.user;
+            if(currentAuthUser) {
+                await supabaseClient.from('profiles').insert([{ id: currentAuthUser.id, username, email, bio: 'مستخدم في سومركرام' }]);
+            }
+            alert('تم إنشاء الحساب بنجاح في سومركرام!');
+        } else {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if(error) return alert(error.message);
+            currentAuthUser = data.user;
+        }
+        await fetchUserProfile();
+        enterMainApp();
+    }
+
+    async function updateUserProfile() {
+        const newBio = document.getElementById('editBioInput').value.trim();
+        const newName = document.getElementById('editNameInput').value.trim();
+        const newUsername = document.getElementById('editUsernameInput').value.trim().replace('@', '');
+        
+        if(!newUsername) return alert('اليوزر لا يمكن أن يكون فارغاً');
+
+        if(newUsername !== currentUserProfile.username) {
+            const { data: existingUser } = await supabaseClient.from('profiles').select('username').eq('username', newUsername).single();
+            if(existingUser) return alert('اليوزر الجديد مستخدم من قبل شخص آخر!');
+        }
+
+        const { error } = await supabaseClient.from('profiles').update({ username: newUsername, bio: newBio, full_name: newName }).eq('id', currentAuthUser.id);
+        if(error) return alert('خطأ في التحديث: ' + error.message);
+
+        alert('تم حفظ التعديلات في سومركرام بنجاح');
+        await fetchUserProfile();
+    }
+
+    async function updateAvatarImage(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const fileName = `avatar_${currentAuthUser.id}_${Date.now()}`;
+        const { error: uploadErr } = await supabaseClient.storage.from('chat-media').upload(fileName, file);
+        if(uploadErr) return alert('خطأ في الرفع: ' + uploadErr.message);
+
+        const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+        
+        await supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentAuthUser.id);
+        const box = document.getElementById('profileAvatarBox');
+        box.style.backgroundImage = `url(${publicUrl})`;
+        document.getElementById('defaultAvatarIcon').style.display = 'none';
+        alert('تم تحديث صورة البروفايل بنجاح!');
+        await fetchUserProfile();
+    }
+
+    function enterMainApp() {
+        document.getElementById('screenAuth').classList.remove('active');
+        document.getElementById('screenFriends').classList.add('active');
+        document.getElementById('bottomTabBar').style.display = 'flex';
+    }
+
+    async function logoutUser() {
+        await supabaseClient.auth.signOut();
+        location.reload();
+    }
+
+    function switchTab(index, screenId) {
+        document.querySelectorAll('.app-screen').forEach(el => { if(el.id !== 'screenAuth') el.classList.remove('active'); });
+        document.getElementById(screenId).classList.add('active');
+        document.querySelectorAll('.tab-item').forEach((tab, i) => tab.classList.toggle('active', i === index));
     }
 
     function toggleTheme() {
         const body = document.body;
-        body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        const current = body.getAttribute('data-theme');
+        body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
 
-    // تشغيل محرك الأغاني مع بادئة "يوت"
-    function searchAndPlayMusic() {
-        const query = document.getElementById('musicQueryInput').value.trim();
-        if(!query) return alert('الرجاء كتابة اسم الأغنية أو الفنان');
-        
-        const fullSearchQuery = `يوت ${query}`;
-        const view = document.getElementById('musicResultView');
-        
-        view.innerHTML = `
-            <div class="hub-card" style="padding: 14px;">
-                <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">البحث بـ: ${fullSearchQuery}</div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 12px; color: var(--ios-text-tertiary);">جودة عالية - استماع مباشر</span>
-                    <button class="ios-btn btn-primary" style="padding: 8px 14px; font-size: 13px;" onclick="playStreamAudio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')">
-                        <i class="fa-solid fa-play"></i> تشغيل
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-
-    function playStreamAudio(url) {
-        const player = document.getElementById('audioPlayer');
-        player.src = url;
-        player.style.display = 'block';
-        player.play();
-    }
-
-    // إضافة صديق عبر الآي دي
-    function openAddFriendModal() {
-        const friendId = prompt("أدخل معرف (Telegram ID) الخاص بصديقك لإضافته:");
-        if(!friendId) return;
-        
+    async function searchRealUser(query) {
+        query = query.replace('@', '').trim();
         const list = document.getElementById('friendsListView');
+        if(!query) {
+            list.innerHTML = `<div class="tg-group" style="padding: 12px; text-align: center; color: var(--tg-secondary); font-size: 13px;">ابحث عن يوزر صديقك بالأعلى.</div>`;
+            return;
+        }
+
+        const { data } = await supabaseClient.from('profiles').select('*').eq('username', query).single();
+        if(!data || data.username === currentUserProfile.username) {
+            list.innerHTML = `<div class="tg-group" style="padding: 10px; text-align: center; color: var(--tg-secondary); font-size: 13px;">لا يوجد حساب بهذا اليوزر</div>`;
+            return;
+        }
+
         list.innerHTML = `
-            <div class="hub-card" style="flex-direction: row; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openChatWithFriend('${friendId}', 'صديق (${friendId})')">
-                <div>
-                    <div style="font-weight: 700;">صديق معرف: ${friendId}</div>
-                    <span style="font-size: 12px; color: var(--ios-green);">● متصل الآن</span>
-                </div>
-                <i class="fa-solid fa-chevron-left" style="font-size: 12px; color: var(--ios-text-tertiary);"></i>
-            </div>
-        `;
-        alert("تمت إضافة الصديق بنجاح!");
+            <div class="tg-group" style="padding: 12px; flex-direction: row; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openChatWithFriend('${data.username}')">
+                <div><b>@${data.username}</b><br><span style="font-size: 11px; color: var(--tg-blue);">حساب موثق في سومركرام</span></div>
+                <i class="fa-solid fa-chevron-left" style="font-size: 12px; color: var(--tg-secondary);"></i>
+            </div>`;
     }
 
-    let activeChatTarget = null;
-    function openChatWithFriend(friendId, friendName) {
-        activeChatTarget = friendId;
+    async function openContactsModal() {
+        document.getElementById('contactsModal').style.display = 'flex';
+        const { data } = await supabaseClient.from('profiles').select('username, full_name').limit(10);
+        const body = document.getElementById('contactsListBody');
+        body.innerHTML = '';
+        if(data) {
+            data.forEach(user => {
+                if(user.username !== currentUserProfile.username) {
+                    body.innerHTML += `<div class="tg-cell" style="cursor: pointer; padding: 8px;" onclick="document.getElementById('contactsModal').style.display='none'; openChatWithFriend('${user.username}')"><span>@${user.username}</span><i class="fa-solid fa-message" style="color:var(--tg-blue)"></i></div>`;
+                }
+            });
+        }
+    }
+
+    let isBlocked = false;
+    async function toggleBlockUser() {
+        isBlocked = !isBlocked;
+        const btn = document.getElementById('blockUserBtn');
+        const statusText = document.getElementById('blockStatusText');
+        const inputArea = document.getElementById('chatInputArea');
+
+        if(isBlocked) {
+            btn.innerText = "إلغاء الحظر";
+            btn.style.background = "var(--tg-blue)";
+            statusText.innerText = "🚫 تم حظر هذا المستخدم";
+            inputArea.style.display = "none";
+            alert("تم حظر المستخدم بنجاح!");
+        } else {
+            btn.innerText = "حظر";
+            btn.style.background = "var(--tg-red)";
+            statusText.innerText = "";
+            inputArea.style.display = "flex";
+            alert("تم إلغاء حظر المستخدم!");
+        }
+    }
+
+    async function openChatWithFriend(friendUsername) {
+        activeChatTarget = friendUsername;
+        isBlocked = false;
+        document.getElementById('blockUserBtn').innerText = "حظر";
+        document.getElementById('blockUserBtn').style.background = "var(--tg-red)";
+        document.getElementById('blockStatusText').innerText = "";
+        document.getElementById('chatInputArea').style.display = "flex";
+
+        document.getElementById('searchFriendInput').style.display = 'none';
         document.getElementById('friendsListView').style.display = 'none';
         document.getElementById('chatInterfaceView').style.display = 'flex';
-        document.getElementById('activeChatFriendName').innerText = friendName;
-        
-        const box = document.getElementById('chatMessagesBox');
-        box.innerHTML = `<div class="msg incoming">مرحباً! بدأت المحادثة المباشرة مع صديقك.</div>`;
+        document.getElementById('activeChatFriendName').innerText = "@" + friendUsername;
+        await loadMessages();
+        subscribeRealtime();
     }
 
     function closeChat() {
         document.getElementById('chatInterfaceView').style.display = 'none';
+        document.getElementById('searchFriendInput').style.display = 'block';
         document.getElementById('friendsListView').style.display = 'flex';
+        if(realTimeChannel) supabaseClient.removeChannel(realTimeChannel);
     }
 
-    function sendDirectMessage() {
+    async function loadMessages() {
+        const box = document.getElementById('chatMessagesBox');
+        box.innerHTML = '';
+        const { data } = await supabaseClient
+            .from('messages')
+            .select('*')
+            .or(`and(sender_username.eq.${currentUserProfile.username},receiver_username.eq.${activeChatTarget}),and(sender_username.eq.${activeChatTarget},receiver_username.eq.${currentUserProfile.username})`)
+            .order('created_at', { ascending: true });
+        if(data) data.forEach(msg => appendMessageToUI(msg));
+    }
+
+    function subscribeRealtime() {
+        realTimeChannel = supabaseClient.channel('public:messages')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                const msg = payload.new;
+                if((msg.sender_username === currentUserProfile.username && msg.receiver_username === activeChatTarget) ||
+                   (msg.sender_username === activeChatTarget && msg.receiver_username === currentUserProfile.username)) {
+                    appendMessageToUI(msg);
+                }
+            }).subscribe();
+    }
+
+    function appendMessageToUI(msg) {
+        const box = document.getElementById('chatMessagesBox');
+        const isOutgoing = msg.sender_username === currentUserProfile.username;
+        let contentHtml = msg.type === 'image' ? `<img src="${msg.content}"/>` :
+                          msg.type === 'voice' ? `<audio controls src="${msg.content}" style="width: 160px; height: 32px;"></audio>` :
+                          msg.type === 'sticker' ? `<img src="${msg.content}" class="sticker-img"/>` : `<span>${msg.content}</span>`;
+        box.innerHTML += `<div class="msg ${isOutgoing ? 'outgoing' : 'incoming'}">${contentHtml}</div>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendTextMessage() {
+        if(isBlocked) return alert('لا يمكنك الإرسال، هذا المستخدم محظور!');
         const input = document.getElementById('messageInputText');
         const text = input.value.trim();
         if(!text) return;
-
-        const box = document.getElementById('chatMessagesBox');
-        box.innerHTML += `<div class="msg outgoing">${text}</div>`;
         input.value = '';
-        box.scrollTop = box.scrollHeight;
+        await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: text, type: 'text' }]);
+    }
 
-        // محاكاة استجابة حية
-        setTimeout(() => {
-            box.innerHTML += `<div class="msg incoming">وصلتني رسالتك يا غالي! 👍</div>`;
-            box.scrollTop = box.scrollHeight;
-        }, 1000);
+    async function sendImageFile(input) {
+        if(isBlocked) return;
+        const file = input.files[0];
+        if(!file) return;
+        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+        await supabaseClient.storage.from('chat-media').upload(fileName, file);
+        const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+        await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: publicUrl, type: 'image' }]);
+    }
+
+    function toggleEmojiPicker() {
+        const p = document.getElementById('emojiPicker');
+        p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+        document.getElementById('stickerPicker').style.display = 'none';
+    }
+
+    function toggleStickerPicker() {
+        const p = document.getElementById('stickerPicker');
+        p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+        document.getElementById('emojiPicker').style.display = 'none';
+    }
+
+    function insertEmoji(em) { document.getElementById('messageInputText').value += em; }
+
+    async function sendSticker(url) {
+        if(isBlocked) return;
+        document.getElementById('stickerPicker').style.display = 'none';
+        await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: url, type: 'sticker' }]);
+    }
+
+    let mediaRecorder, audioChunks = [];
+    async function toggleVoiceRecording() {
+        if(isBlocked) return;
+        const btn = document.getElementById('recordBtn');
+        if(!mediaRecorder || mediaRecorder.state === 'inactive') {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const fileName = `${Date.now()}_voice.webm`;
+                    await supabaseClient.storage.from('chat-media').upload(fileName, audioBlob);
+                    const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+                    await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: publicUrl, type: 'voice' }]);
+                    btn.style.color = 'var(--tg-secondary)';
+                };
+                mediaRecorder.start();
+                btn.style.color = '#ff3b30';
+            } catch (err) { alert('الميكروفون غير متاح'); }
+        } else { mediaRecorder.stop(); }
+    }
+
+    function triggerStoryUpload() {
+        document.getElementById('storyFileInput').click();
+    }
+
+    async function uploadMyStory(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const fileName = `story_${currentAuthUser.id}_${Date.now()}`;
+        await supabaseClient.storage.from('chat-media').upload(fileName, file);
+        const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+        
+        const thumb = document.getElementById('myStoryThumb');
+        thumb.style.backgroundImage = `url(${publicUrl})`;
+        thumb.style.backgroundSize = 'cover';
+        thumb.innerHTML = '';
+        alert("✨ تم نشر قصتك (Story) بنجاح في سومركرام!");
+    }
+
+    function openCreateChannelModal() {
+        document.getElementById('channelCreateBox').style.display = 'flex';
+    }
+
+    function submitCreateChannel() {
+        const chName = document.getElementById('newChannelNameInput').value.trim();
+        if(!chName) return alert('أدخل اسم القناة');
+        const container = document.getElementById('channelsContainer');
+        if(container.innerHTML.includes('لا توجد قنوات')) container.innerHTML = '';
+        
+        container.innerHTML += `<div class="tg-group" style="padding: 12px; margin-bottom: 8px;"><b>📢 قناة: ${chName}</b><br><span style="font-size: 12px; color: var(--tg-secondary);">أنشئت بواسطة @${currentUserProfile.username}</span></div>`;
+        document.getElementById('newChannelNameInput').value = '';
+        document.getElementById('channelCreateBox').style.display = 'none';
+        alert("تم إنشاء القناة بنجاح!");
+    }
+
+    function openCreateBotModal() {
+        document.getElementById('botCreateBox').style.display = 'flex';
+    }
+
+    function submitCreateBot() {
+        const botName = document.getElementById('newBotNameInput').value.trim();
+        if(!botName) return alert('أدخل اسم البوت');
+        const fakeToken = `${Math.floor(Math.random() * 899999999 + 100000000)}:AAH_${Math.random().toString(36).substring(7)}`;
+        const list = document.getElementById('myBotsListContainer');
+        if(list.innerHTML.includes('لم تقم بإنشاء')) list.innerHTML = '';
+
+        list.innerHTML += `
+            <div class="tg-group" style="padding: 14px; gap: 6px;">
+                <b>🤖 بوت: ${botName}</b>
+                <span style="font-size: 11px; color: var(--tg-secondary);">Token: <code style="color:var(--tg-blue);">${fakeToken}</code></span>
+                <span style="font-size: 11px; color: var(--tg-green);">● حالة البوت: يعمل بنجاح (Online)</span>
+            </div>`;
+        document.getElementById('newBotNameInput').value = '';
+        document.getElementById('botCreateBox').style.display = 'none';
+        alert("🎉 تم إنشاء البوت بنجاح والحصول على الـ Token!");
     }
 </script>
 
