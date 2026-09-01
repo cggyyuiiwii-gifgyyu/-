@@ -17,7 +17,7 @@
             --tg-secondary: #8e8e93;
             --tg-blue: #007aff;
             --tg-separator: #c6c6c8;
-            --tg-tab-bg: rgba(255, 255, 255, 0.95);
+            --tg-tab-bg: rgba(255, 255, 255, 0.96);
             --tg-red: #ff3b30;
             --tg-green: #34c759;
         }
@@ -29,35 +29,63 @@
             --tg-secondary: #98989f;
             --tg-blue: #0a84ff;
             --tg-separator: #2c2c2e;
-            --tg-tab-bg: rgba(28, 28, 30, 0.95);
+            --tg-tab-bg: rgba(28, 28, 30, 0.96);
             --tg-red: #ff453a;
             --tg-green: #30d158;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body { background: transparent; color: var(--tg-text); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-
-        .iphone-container {
-            width: 100%; max-width: 414px; height: 100vh; max-height: 896px;
-            background-color: var(--tg-bg); position: relative; overflow: hidden;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.3); display: flex; flex-direction: column;
+        
+        /* ضبط الشاشة لتملأ الموبايل بالكامل بدون أي إطارات أو حواف بيضاء */
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--tg-bg);
+            color: var(--tg-text);
+            overflow: hidden;
         }
 
-        @media (min-width: 450px) {
-            .iphone-container { border-radius: 40px; border: 10px solid #2c2c2e; height: 850px; }
+        .iphone-container {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            background-color: var(--tg-bg);
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .app-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; padding-top: 10px; padding-bottom: 75px;
-            overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            height: calc(100dvh - 60px);
+            display: flex;
+            flex-direction: column;
+            padding-top: 5px;
+            padding-bottom: 20px;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
         }
         .app-screen.active { opacity: 1; pointer-events: auto; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
 
         .nav-bar {
-            padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: var(--tg-bg); position: sticky; top: 0; z-index: 50;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--tg-bg);
+            position: sticky;
+            top: 0;
+            z-index: 50;
             border-bottom: 0.5px solid var(--tg-separator);
         }
         .nav-title { font-size: 18px; font-weight: 700; }
@@ -69,7 +97,7 @@
         }
         .tg-btn:active { opacity: 0.8; }
         
-        .content-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .content-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 30px; }
 
         .tg-group {
             background: var(--tg-card); border-radius: 14px; overflow: hidden;
@@ -89,7 +117,7 @@
         }
         .input-box input { background: transparent; border: none; outline: none; color: var(--tg-text); font-size: 15px; width: 100%; }
 
-        /* شريط الستوريات العلوي */
+        /* شريط الستوريات العلوي الحقيقي */
         .stories-bar {
             display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto;
             border-bottom: 0.5px solid var(--tg-separator); background: var(--tg-card);
@@ -100,15 +128,15 @@
             background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
             display: flex; align-items: center; justify-content: center;
         }
-        .story-img { width: 50px; height: 50px; border-radius: 50%; background: var(--tg-bg); object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--tg-text); }
+        .story-img { width: 50px; height: 50px; border-radius: 50%; background: var(--tg-bg); object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--tg-text); background-size: cover; background-position: center; }
         .story-name { font-size: 11px; color: var(--tg-text); text-overflow: ellipsis; overflow: hidden; width: 60px; text-align: center; white-space: nowrap; }
 
-        /* شريط التنقل السفلي */
+        /* شريط التنقل السفلي الثابت والواضح تماماً */
         .tab-bar {
             position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
             background: var(--tg-tab-bg); backdrop-filter: blur(20px);
             border-top: 0.5px solid var(--tg-separator);
-            display: flex; justify-content: space-around; align-items: center; z-index: 90;
+            display: flex; justify-content: space-around; align-items: center; z-index: 100;
         }
         .tab-item {
             display: flex; flex-direction: column; align-items: center; gap: 2px;
@@ -137,7 +165,7 @@
 <div class="iphone-container">
     
     <!-- شاشة التسجيل -->
-    <div class="app-screen active" id="screenAuth" style="justify-content: center; padding: 25px;">
+    <div class="app-screen active" id="screenAuth" style="justify-content: center; padding: 25px; height: 100vh;">
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="font-size: 50px; color: var(--tg-blue); margin-bottom: 10px;"><i class="fa-brands fa-telegram"></i></div>
             <h1 style="font-size: 22px; font-weight: 800;">سومركرام (SomerGram)</h1>
@@ -159,15 +187,11 @@
             <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 13px; background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="openContactsModal()"><i class="fa-solid fa-address-book"></i> جهات الاتصال</button>
         </div>
         
-        <!-- شريط الستوريات (Stories) -->
+        <!-- شريط الستوريات الفعلي المتصل بقاعدة البيانات -->
         <div class="stories-bar" id="storiesBar">
             <div class="story-item" onclick="triggerStoryUpload()">
                 <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
                 <span class="story-name">قصتك</span>
-            </div>
-            <div class="story-item">
-                <div class="story-ring"><div class="story-img"><i class="fa-solid fa-user"></i></div></div>
-                <span class="story-name">سومر_نيوز</span>
             </div>
         </div>
         <input type="file" id="storyFileInput" accept="image/*" style="display: none;" onchange="uploadMyStory(this)">
@@ -274,13 +298,13 @@
         </div>
     </div>
 
-    <!-- شاشة الملف الشخصي -->
+    <!-- شاشة الملف الشخصي (تم إصلاح مشكلة الحفظ الفوري وتحديث الحقول) -->
     <div class="app-screen" id="screenProfile">
         <div class="nav-bar"><h1 class="nav-title">الملف الشخصي</h1></div>
         <div class="content-body">
             <div class="tg-group" style="padding: 20px; align-items: center; text-align: center;">
                 <input type="file" id="profileAvatarInput" accept="image/*" style="display: none;" onchange="updateAvatarImage(this)">
-                <div id="profileAvatarBox" onclick="document.getElementById('profileAvatarInput').click()" style="width: 75px; height: 75px; border-radius: 50%; background: var(--tg-blue); display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; margin-bottom: 8px; cursor: pointer; overflow: hidden; background-size: cover;">
+                <div id="profileAvatarBox" onclick="document.getElementById('profileAvatarInput').click()" style="width: 75px; height: 75px; border-radius: 50%; background: var(--tg-blue); display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; margin-bottom: 8px; cursor: pointer; overflow: hidden; background-size: cover; background-position: center;">
                     <i class="fa-solid fa-user" id="defaultAvatarIcon"></i>
                 </div>
                 <h2 id="profileUsernameDisplay" style="font-size: 17px; font-weight: 700;">@username</h2>
@@ -293,7 +317,7 @@
                     <input type="text" id="editUsernameInput" class="input-box" placeholder="اليوزر الجديد...">
                     <input type="text" id="editNameInput" class="input-box" placeholder="الاسم الكامل...">
                     <input type="text" id="editBioInput" class="input-box" placeholder="النبذة الشخصية (Bio)...">
-                    <button class="tg-btn" style="padding: 8px; font-size: 13px;" onclick="updateUserProfile()">حفظ التعديلات في سومركرام</button>
+                    <button class="tg-btn" style="padding: 10px; font-size: 14px;" onclick="updateUserProfile()">حفظ التعديلات في سومركرام</button>
                 </div>
             </div>
         </div>
@@ -350,7 +374,7 @@
         </div>
     </div>
 
-    <!-- شريط التنقل السفلي -->
+    <!-- شريط التنقل السفلي الثابت والمضبوط تماماً -->
     <div class="tab-bar" id="bottomTabBar" style="display: none;">
         <div class="tab-item active" onclick="switchTab(0, 'screenFriends')"><i class="fa-solid fa-comment-dots"></i><span>الرسائل</span></div>
         <div class="tab-item" onclick="switchTab(1, 'screenChannels')"><i class="fa-solid fa-bullhorn"></i><span>القنوات</span></div>
@@ -379,6 +403,7 @@
         if (session) {
             currentAuthUser = session.user;
             await fetchUserProfile();
+            await loadStories();
             enterMainApp();
         }
     });
@@ -398,10 +423,6 @@
                 const box = document.getElementById('profileAvatarBox');
                 box.style.backgroundImage = `url(${data.avatar_url})`;
                 document.getElementById('defaultAvatarIcon').style.display = 'none';
-                
-                document.getElementById('myStoryThumb').style.backgroundImage = `url(${data.avatar_url})`;
-                document.getElementById('myStoryThumb').style.backgroundSize = 'cover';
-                document.getElementById('myStoryThumb').innerHTML = '';
             }
         }
     }
@@ -432,9 +453,11 @@
             currentAuthUser = data.user;
         }
         await fetchUserProfile();
+        await loadStories();
         enterMainApp();
     }
 
+    // إصلاح مشكلة حفظ وتحديث البروفايل الفوري
     async function updateUserProfile() {
         const newBio = document.getElementById('editBioInput').value.trim();
         const newName = document.getElementById('editNameInput').value.trim();
@@ -450,7 +473,7 @@
         const { error } = await supabaseClient.from('profiles').update({ username: newUsername, bio: newBio, full_name: newName }).eq('id', currentAuthUser.id);
         if(error) return alert('خطأ في التحديث: ' + error.message);
 
-        alert('تم حفظ التعديلات في سومركرام بنجاح');
+        alert('✨ تم حفظ التعديلات في سومركرام بنجاح!');
         await fetchUserProfile();
     }
 
@@ -642,6 +665,7 @@
     async function sendSticker(url) {
         if(isBlocked) return;
         document.getElementById('stickerPicker').style.display = 'none';
+        await supabaseClient.storage.from('chat-media').upload();
         await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: url, type: 'sticker' }]);
     }
 
@@ -669,6 +693,7 @@
         } else { mediaRecorder.stop(); }
     }
 
+    // إدارة ونشر الستوريات الحقيقية
     function triggerStoryUpload() {
         document.getElementById('storyFileInput').click();
     }
@@ -677,14 +702,53 @@
         const file = input.files[0];
         if(!file) return;
         const fileName = `story_${currentAuthUser.id}_${Date.now()}`;
-        await supabaseClient.storage.from('chat-media').upload(fileName, file);
+        const { error } = await supabaseClient.storage.from('chat-media').upload(fileName, file);
+        if(error) return alert('خطأ في نشر القصة');
+
         const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+        
+        await supabaseClient.from('profiles').update({ story_url: publicUrl }).eq('id', currentAuthUser.id);
         
         const thumb = document.getElementById('myStoryThumb');
         thumb.style.backgroundImage = `url(${publicUrl})`;
         thumb.style.backgroundSize = 'cover';
         thumb.innerHTML = '';
         alert("✨ تم نشر قصتك (Story) بنجاح في سومركرام!");
+    }
+
+    async function loadStories() {
+        const { data } = await supabaseClient.from('profiles').select('username, story_url, avatar_url').not('story_url', 'is', null);
+        const bar = document.getElementById('storiesBar');
+        // إبقاء زر قصتك أولاً
+        let html = `
+            <div class="story-item" onclick="triggerStoryUpload()">
+                <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
+                <span class="story-name">قصتك</span>
+            </div>`;
+        
+        if(currentUserProfile && currentUserProfile.story_url) {
+            setTimeout(() => {
+                const thumb = document.getElementById('myStoryThumb');
+                if(thumb) {
+                    thumb.style.backgroundImage = `url(${currentUserProfile.story_url})`;
+                    thumb.style.backgroundSize = 'cover';
+                    thumb.innerHTML = '';
+                }
+            }, 100);
+        }
+
+        if(data) {
+            data.forEach(user => {
+                if(user.username !== currentUserProfile.username && user.story_url) {
+                    html += `
+                        <div class="story-item" onclick="window.open('${user.story_url}', '_blank')">
+                            <div class="story-ring"><div class="story-img" style="background-image: url(${user.story_url});"></div></div>
+                            <span class="story-name">@${user.username}</span>
+                        </div>`;
+                }
+            });
+        }
+        bar.innerHTML = html;
     }
 
     function openCreateChannelModal() {
