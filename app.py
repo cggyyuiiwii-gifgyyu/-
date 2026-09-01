@@ -68,6 +68,9 @@ def api_create_pack():
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         return jsonify({'status': 'error', 'error': 'فشل حفظ ملف الصورة محلياً'})
 
+    # اسم الحزمة الإلزامي المطابق لقواعد تليجرام ويوزر بوتك ddawebot
+    safe_name = target_pack if (action_type == 'add' and target_pack) else f"v{user_id}_{os.urandom(4).hex()}_by_ddawebot".lower()
+
     if action_type == 'add' and target_pack:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/addStickerToSet"
         with open(file_path, 'rb') as sticker_file:
@@ -80,9 +83,6 @@ def api_create_pack():
             response = requests.post(url, data=payload, files=files)
             res_json = response.json()
     else:
-        # استخدام اللاحقة المطابقة ليوزر بوتك ddawebot بنجاح تام
-        safe_name = f"v{user_id}{os.urandom(3).hex()}_by_ddawebot".lower()
-        
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/createNewStickerSet"
         with open(file_path, 'rb') as sticker_file:
             files = {'png_sticker': (temp_file_name, sticker_file, 'image/png')}
@@ -96,14 +96,14 @@ def api_create_pack():
             response = requests.post(url, data=payload, files=files)
             res_json = response.json()
             
-            # محاولة احتياطية ثانية بترك الاسم فارغاً ليتولاه تليجرام تلقائياً إذا حدث أي تعارض
+            # محاولة أخيرة بأسلوب بديل في حال حدث تكرار في الاسم العشوائي
             if not res_json.get('ok'):
-                payload['name'] = ""
+                safe_name = f"pack{user_id}{os.urandom(5).hex()}byddawebot".lower()
+                payload['name'] = safe_name
                 with open(file_path, 'rb') as retry_file:
                     retry_files = {'png_sticker': (temp_file_name, retry_file, 'image/png')}
                     response = requests.post(url, data=payload, files=retry_files)
                     res_json = response.json()
-                    safe_name = res_json.get('result', {}).get('name', safe_name)
     
     if res_json.get('ok'):
         stats_data['total_packs'] += 1
