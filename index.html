@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سومركرام — SomerGram Ultimate Pro</title>
+    <title>سومركرام — SomerGram Real Master</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -84,7 +84,7 @@
         }
         .input-box input { background: transparent; border: none; outline: none; color: var(--tg-text); font-size: 15px; width: 100%; }
 
-        /* شريط الستوريات العلوي */
+        /* شريط الستوريات العلوي الحقيقي */
         .stories-bar {
             display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto;
             border-bottom: 0.5px solid var(--tg-separator); background: var(--tg-card);
@@ -131,18 +131,18 @@
 
 <div class="iphone-container">
     
-    <!-- شاشة التسجيل الفوري (بدون انتظار إيميل) -->
+    <!-- شاشة التسجيل الحقيقي بالبريد وكلمة المرور واليوزر -->
     <div class="app-screen active" id="screenAuth" style="justify-content: center; padding: 25px; height: 100vh;">
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="font-size: 50px; color: var(--tg-blue); margin-bottom: 10px;"><i class="fa-brands fa-telegram"></i></div>
             <h1 style="font-size: 22px; font-weight: 800;">سومركرام (SomerGram)</h1>
-            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الفوري للدخول المباشر</p>
+            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الحقيقي للمراسلة الفورية</p>
         </div>
         <div class="tg-group" style="padding: 15px; gap: 12px;">
             <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (English Only مثل: ali)..."></div>
-            <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="authEmail" placeholder="البريد الإلكتروني..."></div>
+            <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="authEmail" placeholder="البريد الإلكتروني الحقيقي..."></div>
             <div class="input-box"><i class="fa-solid fa-lock"></i><input type="password" id="authPassword" placeholder="كلمة المرور..."></div>
-            <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب ودخول فوري</button>
+            <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب جديد ودخول</button>
             <button class="tg-btn" style="background: transparent; color: var(--tg-blue); border: 1px solid var(--tg-blue);" onclick="handleEmailAuth('login')">تسجيل الدخول</button>
         </div>
     </div>
@@ -154,7 +154,7 @@
             <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 13px; background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="openContactsModal()"><i class="fa-solid fa-address-book"></i> جهات الاتصال</button>
         </div>
         
-        <!-- شريط الستوريات العلوي -->
+        <!-- شريط الستوريات العلوي الحقيقي -->
         <div class="stories-bar" id="storiesBar">
             <div class="story-item" onclick="handleMyStoryClick()">
                 <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
@@ -230,7 +230,7 @@
         </div>
     </div>
 
-    <!-- شاشة الملف الشخصي (وضع القراءة + التعديل المنفصل) -->
+    <!-- شاشة الملف الشخصي (وضع القراءة وزر التعديل المنفصل) -->
     <div class="app-screen" id="screenProfile">
         <div class="nav-bar">
             <h1 class="nav-title">الملف الشخصي</h1>
@@ -242,7 +242,7 @@
                 <div id="profileViewAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: var(--tg-blue); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; background-size: cover; background-position: center;">
                     <i class="fa-solid fa-user"></i>
                 </div>
-                <h2 id="viewProfileName" style="font-size: 18px; font-weight: 800;">الاسم الكامل</h2>
+                <h2 id="viewProfileName" style="font-size: 18px; font-weight: 800;">الاسم</h2>
                 <span id="viewProfileUsername" style="font-size: 14px; color: var(--tg-blue);">@username</span>
                 <p id="viewProfileBio" style="font-size: 13px; color: var(--tg-secondary);">لا توجد نبذة شخصية...</p>
             </div>
@@ -272,7 +272,7 @@
         <div class="content-body">
             <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px;">إدارة الحساب</div>
             <div class="tg-group">
-                <div class="tg-cell tg-cell-action" onclick="alert('حسابك مفعل وفوري في سومركرام.')">
+                <div class="tg-cell tg-cell-action" onclick="alert('حسابك نشط وحقيقي في سومركرام.')">
                     <span>حالة الحساب</span>
                     <span style="color: var(--tg-green); font-size: 14px;">● نشط</span>
                 </div>
@@ -374,29 +374,19 @@
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             currentAuthUser = session.user;
-            await checkAndCreateProfile();
+            await fetchUserProfile();
             await loadStories();
             await loadChannels();
             enterMainApp();
         }
     });
 
-    async function checkAndCreateProfile() {
-        let { data, error } = await supabaseClient.from('profiles').select('*').eq('id', currentAuthUser.id).single();
-        if (!data) {
-            let defaultUsername = currentAuthUser.email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '') + Math.floor(Math.random()*1000);
-            await supabaseClient.from('profiles').insert([{
-                id: currentAuthUser.id,
-                username: defaultUsername,
-                email: currentAuthUser.email,
-                full_name: defaultUsername,
-                bio: 'مستخدم في سومركرام'
-            }]);
-            let res = await supabaseClient.from('profiles').select('*').eq('id', currentAuthUser.id).single();
-            data = res.data;
+    async function fetchUserProfile() {
+        const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', currentAuthUser.id).single();
+        if (data) {
+            currentUserProfile = data;
+            updateProfileUI();
         }
-        currentUserProfile = data;
-        updateProfileUI();
     }
 
     function updateProfileUI() {
@@ -404,7 +394,7 @@
         document.getElementById('profileUsernameDisplay').innerText = "@" + currentUserProfile.username;
         document.getElementById('settingsUsernameVal').innerText = "@" + currentUserProfile.username;
         
-        document.getElementById('viewProfileName').innerText = currentUserProfile.full_name || "بدون اسم";
+        document.getElementById('viewProfileName').innerText = currentUserProfile.full_name || currentUserProfile.username;
         document.getElementById('viewProfileUsername').innerText = "@" + currentUserProfile.username;
         document.getElementById('viewProfileBio').innerText = currentUserProfile.bio || "لا توجد نبذة شخصية...";
 
@@ -436,6 +426,7 @@
         if(!email || !password) return alert('الرجاء إدخال البريد وكلمة المرور');
 
         if(type === 'signup') {
+            if(!username) return alert('الرجاء كتابة اسم المستخدم (Username)');
             const { data: existingUser } = await supabaseClient.from('profiles').select('username').eq('username', username).single();
             if(existingUser) return alert('هذا اليوزر مستخدم بالفعل');
 
@@ -443,9 +434,9 @@
             if(error) return alert(error.message);
             
             if(data.user) {
-                await supabaseClient.from('profiles').insert([{ id: data.user.id, username, email, bio: 'مستخدم في سومركرام', full_name: username }]);
                 currentAuthUser = data.user;
-                await checkAndCreateProfile();
+                await supabaseClient.from('profiles').insert([{ id: currentAuthUser.id, username, email, bio: 'مستخدم في سومركرام', full_name: username }]);
+                await fetchUserProfile();
                 await loadStories();
                 await loadChannels();
                 enterMainApp();
@@ -454,7 +445,7 @@
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if(error) return alert(error.message);
             currentAuthUser = data.user;
-            await checkAndCreateProfile();
+            await fetchUserProfile();
             await loadStories();
             await loadChannels();
             enterMainApp();
@@ -497,7 +488,7 @@
 
         alert('✨ تم حفظ التعديلات في سومركرام بنجاح!');
         toggleProfileEditMode();
-        await checkAndCreateProfile();
+        await fetchUserProfile();
     }
 
     async function updateAvatarImage(input) {
@@ -511,7 +502,7 @@
         
         await supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentAuthUser.id);
         alert('تم تحديث صورة البروفايل بنجاح!');
-        await checkAndCreateProfile();
+        await fetchUserProfile();
     }
 
     function enterMainApp() {
@@ -728,7 +719,7 @@
         await supabaseClient.from('profiles').update({ story_url: publicUrl }).eq('id', currentAuthUser.id);
         
         alert("✨ تم نشر قصتك (Story) بنجاح في سومركرام!");
-        await checkAndCreateProfile();
+        await fetchUserProfile();
         await loadStories();
     }
 
@@ -745,7 +736,7 @@
         await supabaseClient.from('profiles').update({ story_url: null }).eq('id', currentAuthUser.id);
         document.getElementById('storyViewerModal').style.display = 'none';
         alert('تم حذف قصتك بنجاح');
-        await checkAndCreateProfile();
+        await fetchUserProfile();
         await loadStories();
     }
 
