@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سومركرام — SomerGram Ultimate Pro</title>
+    <title>سومركرام — SomerGram Master Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
             --tg-tab-bg: rgba(255, 255, 255, 0.96);
             --tg-red: #ff3b30;
             --tg-green: #34c759;
+            --tg-facebook: #1877f2;
         }
 
         [data-theme="dark"] {
@@ -32,6 +33,7 @@
             --tg-tab-bg: rgba(28, 28, 30, 0.96);
             --tg-red: #ff453a;
             --tg-green: #30d158;
+            --tg-facebook: #1877f2;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -131,19 +133,25 @@
 
 <div class="iphone-container">
     
-    <!-- شاشة التسجيل -->
+    <!-- شاشة التسجيل (تأكيد البريد + فيسبوك) -->
     <div class="app-screen active" id="screenAuth" style="justify-content: center; padding: 25px; height: 100vh;">
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="font-size: 50px; color: var(--tg-blue); margin-bottom: 10px;"><i class="fa-brands fa-telegram"></i></div>
             <h1 style="font-size: 22px; font-weight: 800;">سومركرام (SomerGram)</h1>
-            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الأقوى للمراسلة الفورية</p>
+            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الآمن مع تأكيد البريد وفيسبوك</p>
         </div>
         <div class="tg-group" style="padding: 15px; gap: 12px;">
-            <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (إنجليزي فقط مثل: ali)..."></div>
+            <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (English Only مثل: ali)..."></div>
             <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="authEmail" placeholder="البريد الإلكتروني الحقيقي..."></div>
             <div class="input-box"><i class="fa-solid fa-lock"></i><input type="password" id="authPassword" placeholder="كلمة المرور..."></div>
-            <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب حقيقي جديد</button>
+            <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب (مع تأكيد الإيميل)</button>
             <button class="tg-btn" style="background: transparent; color: var(--tg-blue); border: 1px solid var(--tg-blue);" onclick="handleEmailAuth('login')">تسجيل الدخول</button>
+            
+            <div style="display: flex; align-items: center; text-align: center; color: var(--tg-secondary); font-size: 12px; margin: 5px 0;">
+                <hr style="flex: 1; border-color: var(--tg-separator);"> أو عبر <hr style="flex: 1; border-color: var(--tg-separator);">
+            </div>
+            
+            <button class="tg-btn" style="background: var(--tg-facebook);" onclick="signInWithFacebook()"><i class="fa-brands fa-facebook"></i> تسجيل الدخول بواسطة Facebook</button>
         </div>
     </div>
 
@@ -166,7 +174,7 @@
         <div class="content-body">
             <div class="input-box">
                 <i class="fa-solid fa-magnifying-glass" style="color: var(--tg-secondary);"></i>
-                <input type="text" id="searchFriendInput" placeholder="بحث عن يوزر صديق (إنجليزي)..." oninput="searchRealUser(this.value)">
+                <input type="text" id="searchFriendInput" placeholder="بحث عن يوزر صديق (English)..." oninput="searchRealUser(this.value)">
             </div>
 
             <div id="friendsListView" style="display: flex; flex-direction: column; gap: 8px;">
@@ -238,7 +246,7 @@
         </div>
     </div>
 
-    <!-- شاشة الملف الشخصي (وضع القراءة + زر التعديل المنفصل) -->
+    <!-- شاشة الملف الشخصي (وضع القراءة + زر التعديل المنفصل واليوزر الإنجليزي) -->
     <div class="app-screen" id="screenProfile">
         <div class="nav-bar">
             <h1 class="nav-title">الملف الشخصي</h1>
@@ -280,9 +288,9 @@
         <div class="content-body">
             <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px;">إدارة الحساب</div>
             <div class="tg-group">
-                <div class="tg-cell tg-cell-action" onclick="alert('حسابك مؤمن برقم هاتف موثق.')">
-                    <span>رقم الهاتـف</span>
-                    <span style="color: var(--tg-secondary); font-size: 14px;">+964 ••• ••••</span>
+                <div class="tg-cell tg-cell-action" onclick="alert('حسابك آمن عبر البريد الإلكتروني الموثق.')">
+                    <span>حالة التوثيق</span>
+                    <span style="color: var(--tg-green); font-size: 14px;">● بريد مؤكد</span>
                 </div>
                 <div class="tg-cell tg-cell-action" onclick="switchTab(2, 'screenProfile')">
                     <span>اسم المستخدم (Username)</span>
@@ -346,7 +354,7 @@
         </div>
     </div>
 
-    <!-- نافذة المستخدمين المحظورين والأرشيف -->
+    <!-- نافذة عامة (للمحظورين والأرشيف) -->
     <div id="genericModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000;">
         <div class="tg-group" style="width: 85%; max-width: 320px; padding: 20px; background: var(--tg-bg);">
             <h3 id="genericModalTitle" style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">العنوان</h3>
@@ -382,41 +390,102 @@
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             currentAuthUser = session.user;
-            await fetchUserProfile();
+            await checkAndCreateProfile();
             await loadStories();
+            await loadChannels();
             enterMainApp();
         }
     });
 
-    async function fetchUserProfile() {
-        const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentAuthUser.id).single();
-        if (data) {
-            currentUserProfile = data;
-            document.getElementById('profileUsernameDisplay').innerText = "@" + data.username;
-            document.getElementById('settingsUsernameVal').innerText = "@" + data.username;
-            
-            // تحديث بيانات وضع العرض للملف الشخصي
-            document.getElementById('viewProfileName').innerText = data.full_name || "بدون اسم";
-            document.getElementById('viewProfileUsername').innerText = "@" + data.username;
-            document.getElementById('viewProfileBio').innerText = data.bio || "لا توجد نبذة شخصية...";
+    async function checkAndCreateProfile() {
+        let { data, error } = await supabaseClient.from('profiles').select('*').eq('id', currentAuthUser.id).single();
+        if (!data) {
+            let defaultUsername = currentAuthUser.email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '') + Math.floor(Math.random()*1000);
+            await supabaseClient.from('profiles').insert([{
+                id: currentAuthUser.id,
+                username: defaultUsername,
+                email: currentAuthUser.email,
+                full_name: currentAuthUser.user_metadata?.full_name || defaultUsername,
+                bio: 'مستخدم جديد في سومركرام'
+            }]);
+            let res = await supabaseClient.from('profiles').select('*').eq('id', currentAuthUser.id).single();
+            data = res.data;
+        }
+        currentUserProfile = data;
+        updateProfileUI();
+    }
 
-            document.getElementById('editBioInput').value = data.bio || "";
-            document.getElementById('editNameInput').value = data.full_name || "";
-            document.getElementById('editUsernameInput').value = data.username || "";
-            
-            if(data.avatar_url) {
-                const box = document.getElementById('profileAvatarBox');
-                box.style.backgroundImage = `url(${data.avatar_url})`;
-                document.getElementById('defaultAvatarIcon').style.display = 'none';
+    function updateProfileUI() {
+        if (!currentUserProfile) return;
+        document.getElementById('profileUsernameDisplay').innerText = "@" + currentUserProfile.username;
+        document.getElementById('settingsUsernameVal').innerText = "@" + currentUserProfile.username;
+        
+        document.getElementById('viewProfileName').innerText = currentUserProfile.full_name || "بدون اسم";
+        document.getElementById('viewProfileUsername').innerText = "@" + currentUserProfile.username;
+        document.getElementById('viewProfileBio').innerText = currentUserProfile.bio || "لا توجد نبذة شخصية...";
 
-                const viewAvatar = document.getElementById('profileViewAvatar');
-                viewAvatar.style.backgroundImage = `url(${data.avatar_url})`;
-                viewAvatar.innerHTML = '';
-            }
+        document.getElementById('editBioInput').value = currentUserProfile.bio || "";
+        document.getElementById('editNameInput').value = currentUserProfile.full_name || "";
+        document.getElementById('editUsernameInput').value = currentUserProfile.username || "";
+        
+        if(currentUserProfile.avatar_url) {
+            const box = document.getElementById('profileAvatarBox');
+            box.style.backgroundImage = `url(${currentUserProfile.avatar_url})`;
+            document.getElementById('defaultAvatarIcon').style.display = 'none';
+
+            const viewAvatar = document.getElementById('profileViewAvatar');
+            viewAvatar.style.backgroundImage = `url(${currentUserProfile.avatar_url})`;
+            viewAvatar.innerHTML = '';
         }
     }
 
-    // تبديل وضع عرض الملف الشخصي إلى وضع التعديل
+    // تسجيل الدخول عبر Facebook OAuth
+    async function signInWithFacebook() {
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'facebook',
+            options: { redirectTo: window.location.origin }
+        });
+        if(error) alert('خطأ في تسجيل فيسبوك: ' + error.message);
+    }
+
+    async function handleEmailAuth(type) {
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value.trim();
+        let username = document.getElementById('authUsername').value.trim().replace('@', '');
+        
+        const englishRegex = /^[A-Za-z0-9_]+$/;
+        if(type === 'signup' && !englishRegex.test(username)) {
+            return alert('❌ اسم المستخدم (Username) يجب أن يكون باللغة الإنجليزية والأرقام فقط!');
+        }
+
+        if(!email || !password) return alert('الرجاء إدخال البريد وكلمة المرور');
+
+        if(type === 'signup') {
+            const { data: existingUser } = await supabaseClient.from('profiles').select('username').eq('username', username).single();
+            if(existingUser) return alert('هذا اليوزر مستخدم بالفعل');
+
+            const { data, error } = await supabaseClient.auth.signUp({ 
+                email, 
+                password,
+                options: { emailRedirectTo: window.location.origin }
+            });
+            if(error) return alert(error.message);
+            
+            if(data.user) {
+                await supabaseClient.from('profiles').insert([{ id: data.user.id, username, email, bio: 'مستخدم في سومركرام', full_name: username }]);
+            }
+            alert('✨ تم إرسال رسالة تفعيل إلى بريدك الإلكتروني! يرجى التحقق من بريدك لتفعيل الحساب ثم تسجيل الدخول.');
+        } else {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if(error) return alert(error.message);
+            currentAuthUser = data.user;
+            await checkAndCreateProfile();
+            await loadStories();
+            await loadChannels();
+            enterMainApp();
+        }
+    }
+
     function toggleProfileEditMode() {
         const editBox = document.getElementById('profileEditMode');
         const viewBox = document.getElementById('profileViewMode');
@@ -431,41 +500,6 @@
             viewBox.style.display = 'flex';
             btn.innerText = "تعديل الملف";
         }
-    }
-
-    async function handleEmailAuth(type) {
-        const email = document.getElementById('authEmail').value.trim();
-        const password = document.getElementById('authPassword').value.trim();
-        let username = document.getElementById('authUsername').value.trim().replace('@', '');
-        
-        // التحقق من أن اليوزر إنجليزي فقط
-        const englishRegex = /^[A-Za-z0-9_]+$/;
-        if(type === 'signup' && !englishRegex.test(username)) {
-            return alert('❌ عذراً، اسم المستخدم (Username) يجب أن يكون باللغة الإنجليزية والأرقام فقط!');
-        }
-
-        if(!email || !password) return alert('الرجاء إدخال البريد وكلمة المرور');
-
-        if(type === 'signup') {
-            const { data: existingUser } = await supabaseClient.from('profiles').select('username').eq('username', username).single();
-            if(existingUser) return alert('هذا اليوزر مستخدم بالفعل');
-
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if(error) return alert(error.message);
-            
-            currentAuthUser = data.user;
-            if(currentAuthUser) {
-                await supabaseClient.from('profiles').insert([{ id: currentAuthUser.id, username, email, bio: 'مستخدم في سومركرام', full_name: username }]);
-            }
-            alert('تم إنشاء الحساب بنجاح في سومركرام!');
-        } else {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if(error) return alert(error.message);
-            currentAuthUser = data.user;
-        }
-        await fetchUserProfile();
-        await loadStories();
-        enterMainApp();
     }
 
     async function updateUserProfile() {
@@ -488,7 +522,7 @@
 
         alert('✨ تم حفظ التعديلات في سومركرام بنجاح!');
         toggleProfileEditMode();
-        await fetchUserProfile();
+        await checkAndCreateProfile();
     }
 
     async function updateAvatarImage(input) {
@@ -498,11 +532,11 @@
         const { error: uploadErr } = await supabaseClient.storage.from('chat-media').upload(fileName, file);
         if(uploadErr) return alert('خطأ في الرفع: ' + uploadErr.message);
 
-        const { data: { publicUrl } } = await supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+        const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
         
         await supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentAuthUser.id);
         alert('تم تحديث صورة البروفايل بنجاح!');
-        await fetchUserProfile();
+        await checkAndCreateProfile();
     }
 
     function enterMainApp() {
@@ -703,7 +737,6 @@
         } else { mediaRecorder.stop(); }
     }
 
-    // إدارة ونشر وعرض الستوريات الحقيقية
     function triggerStoryUpload() {
         document.getElementById('storyFileInput').click();
     }
@@ -720,7 +753,7 @@
         await supabaseClient.from('profiles').update({ story_url: publicUrl }).eq('id', currentAuthUser.id);
         
         alert("✨ تم نشر قصتك (Story) بنجاح في سومركرام!");
-        await fetchUserProfile();
+        await checkAndCreateProfile();
         await loadStories();
     }
 
@@ -737,7 +770,7 @@
         await supabaseClient.from('profiles').update({ story_url: null }).eq('id', currentAuthUser.id);
         document.getElementById('storyViewerModal').style.display = 'none';
         alert('تم حذف قصتك بنجاح');
-        await fetchUserProfile();
+        await checkAndCreateProfile();
         await loadStories();
     }
 
@@ -774,20 +807,32 @@
         bar.innerHTML = html;
     }
 
+    // إدارة القنوات الحقيقية عبر Supabase
     function openCreateChannelModal() {
-        document.getElementById('channelCreateBox').style.display = 'flex';
+        const chName = prompt("أدخل اسم القناة الجديدة:");
+        if(!chName) return;
+        submitCreateChannel(chName);
     }
 
-    function submitCreateChannel() {
-        const chName = document.getElementById('newChannelNameInput').value.trim();
-        if(!chName) return alert('أدخل اسم القناة');
+    async function submitCreateChannel(chName) {
+        const { error } = await supabaseClient.from('channels').insert([{ name: chName, creator_username: currentUserProfile.username }]);
+        if(error) return alert('هذه القناة موجودة مسبقاً، اختر اسماً آخر.');
+        alert("✨ تم إنشاء القناة ونشرها بنجاح!");
+        await loadChannels();
+    }
+
+    async function loadChannels() {
+        const { data } = await supabaseClient.from('channels').select('*').order('created_at', { ascending: false });
         const container = document.getElementById('channelsContainer');
-        if(container.innerHTML.includes('لا توجد قنوات')) container.innerHTML = '';
-        
-        container.innerHTML += `<div class="tg-group" style="padding: 12px; margin-bottom: 8px;"><b>📢 قناة: ${chName}</b><br><span style="font-size: 12px; color: var(--tg-secondary);">أنشئت بواسطة @${currentUserProfile.username}</span></div>`;
-        document.getElementById('newChannelNameInput').value = '';
-        document.getElementById('channelCreateBox').style.display = 'none';
-        alert("تم إنشاء القناة بنجاح!");
+        if(!data || data.length === 0) {
+            container.innerHTML = `<div class="tg-group" style="padding: 15px; text-align: center; color: var(--tg-secondary);">لا توجد قنوات حالياً.</div>`;
+            return;
+        }
+        let html = '';
+        data.forEach(ch => {
+            html += `<div class="tg-group" style="padding: 12px; margin-bottom: 8px;"><b>📢 قناة: ${ch.name}</b><br><span style="font-size: 12px; color: var(--tg-secondary);">أنشئت بواسطة @${ch.creator_username}</span></div>`;
+        });
+        container.innerHTML = html;
     }
 
     function openBlockedUsersModal() {
