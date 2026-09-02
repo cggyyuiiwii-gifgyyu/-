@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سومركرام — SomerGram Real Master</title>
+    <title>سومركرام — SomerGram Perfect Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -84,7 +84,6 @@
         }
         .input-box input { background: transparent; border: none; outline: none; color: var(--tg-text); font-size: 15px; width: 100%; }
 
-        /* شريط الستوريات العلوي الحقيقي */
         .stories-bar {
             display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto;
             border-bottom: 0.5px solid var(--tg-separator); background: var(--tg-card);
@@ -98,7 +97,6 @@
         .story-img { width: 50px; height: 50px; border-radius: 50%; background: var(--tg-bg); object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--tg-text); background-size: cover; background-position: center; }
         .story-name { font-size: 11px; color: var(--tg-text); text-overflow: ellipsis; overflow: hidden; width: 60px; text-align: center; white-space: nowrap; }
 
-        /* شريط التنقل السفلي */
         .tab-bar {
             position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
             background: var(--tg-tab-bg); backdrop-filter: blur(20px);
@@ -131,30 +129,29 @@
 
 <div class="iphone-container">
     
-    <!-- شاشة التسجيل الحقيقي بالبريد وكلمة المرور واليوزر -->
+    <!-- شاشة التسجيل الحقيقي -->
     <div class="app-screen active" id="screenAuth" style="justify-content: center; padding: 25px; height: 100vh;">
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="font-size: 50px; color: var(--tg-blue); margin-bottom: 10px;"><i class="fa-brands fa-telegram"></i></div>
             <h1 style="font-size: 22px; font-weight: 800;">سومركرام (SomerGram)</h1>
-            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الحقيقي للمراسلة الفورية</p>
+            <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الحقيقي الآمن</p>
         </div>
         <div class="tg-group" style="padding: 15px; gap: 12px;">
-            <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (English Only مثل: ali)..."></div>
-            <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="authEmail" placeholder="البريد الإلكتروني الحقيقي..."></div>
+            <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (English مثل: ali)..."></div>
+            <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="authEmail" placeholder="البريد الإلكتروني..."></div>
             <div class="input-box"><i class="fa-solid fa-lock"></i><input type="password" id="authPassword" placeholder="كلمة المرور..."></div>
-            <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب جديد ودخول</button>
+            <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب جديد</button>
             <button class="tg-btn" style="background: transparent; color: var(--tg-blue); border: 1px solid var(--tg-blue);" onclick="handleEmailAuth('login')">تسجيل الدخول</button>
         </div>
     </div>
 
-    <!-- شاشة الدردشة وجهات الاتصال والستوريات -->
+    <!-- شاشة الدردشة والستوريات -->
     <div class="app-screen" id="screenFriends">
         <div class="nav-bar">
             <h1 class="nav-title">سومركرام</h1>
             <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 13px; background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="openContactsModal()"><i class="fa-solid fa-address-book"></i> جهات الاتصال</button>
         </div>
         
-        <!-- شريط الستوريات العلوي الحقيقي -->
         <div class="stories-bar" id="storiesBar">
             <div class="story-item" onclick="handleMyStoryClick()">
                 <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
@@ -189,22 +186,9 @@
                 </div>
                 <div class="chat-box" id="chatMessagesBox" style="margin-top: 8px;"></div>
                 
-                <div class="picker-panel" id="emojiPicker">
-                    <span class="emoji-item" onclick="insertEmoji('😊')">😊</span>
-                    <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
-                    <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
-                    <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
-                </div>
-                
-                <div class="picker-panel" id="stickerPicker">
-                    <div class="sticker-item" onclick="sendSticker('https://raw.githubusercontent.com/TelegramBots/book/master/src/docs/sticker.png')"><img src="https://raw.githubusercontent.com/TelegramBots/book/master/src/docs/sticker.png"></div>
-                </div>
-
                 <div style="display: flex; gap: 6px; align-items: center; margin-top: 8px;" id="chatInputArea">
                     <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="sendImageFile(this)">
                     <button class="tg-btn" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; background: var(--tg-card); border: 0.5px solid var(--tg-separator); color: var(--tg-blue);" onclick="document.getElementById('imageInput').click()"><i class="fa-solid fa-image"></i></button>
-                    <button class="tg-btn" id="recordBtn" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; background: var(--tg-card); border: 0.5px solid var(--tg-separator); color: var(--tg-secondary);" onclick="toggleVoiceRecording()"><i class="fa-solid fa-microphone"></i></button>
-                    <button class="tg-btn" style="width: 36px; height: 36px; padding: 0; border-radius: 50%; background: var(--tg-card); border: 0.5px solid var(--tg-separator); color: #af52de;" onclick="toggleStickerPicker()"><i class="fa-solid fa-note-sticky"></i></button>
                     
                     <div class="input-box" style="flex: 1; margin: 0; padding: 6px 10px;">
                         <input type="text" id="messageInputText" placeholder="رسالة...">
@@ -230,7 +214,7 @@
         </div>
     </div>
 
-    <!-- شاشة الملف الشخصي (وضع القراءة وزر التعديل المنفصل) -->
+    <!-- شاشة الملف الشخصي (وضع القراءة + زر التعديل المنفصل) -->
     <div class="app-screen" id="screenProfile">
         <div class="nav-bar">
             <h1 class="nav-title">الملف الشخصي</h1>
@@ -266,7 +250,7 @@
         </div>
     </div>
 
-    <!-- شاشة الإعدادات الاحترافية -->
+    <!-- شاشة الإعدادات -->
     <div class="app-screen" id="screenSettings">
         <div class="nav-bar"><h1 class="nav-title">الإعدادات</h1></div>
         <div class="content-body">
@@ -282,31 +266,11 @@
                 </div>
             </div>
 
-            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px; margin-top: 5px;">الخصوصية والأمان</div>
-            <div class="tg-group">
-                <div class="tg-cell">
-                    <span>حالة الظهور (آخر ظهور)</span>
-                    <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--tg-blue);">
-                </div>
-                <div class="tg-cell tg-cell-action" onclick="openBlockedUsersModal()">
-                    <span>المستخدمون المحظورون</span>
-                    <i class="fa-solid fa-ban" style="color: var(--tg-red);"></i>
-                </div>
-                <div class="tg-cell tg-cell-action" onclick="openArchiveModal()">
-                    <span>أرشيف المحادثات</span>
-                    <i class="fa-solid fa-box-archive" style="color: var(--tg-blue);"></i>
-                </div>
-            </div>
-
-            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px; margin-top: 5px;">المظهر والإشعارات</div>
+            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px; margin-top: 5px;">المظهر</div>
             <div class="tg-group">
                 <div class="tg-cell tg-cell-action" onclick="toggleTheme()">
                     <span>الوضع الليلي / النهاري</span>
                     <i class="fa-solid fa-circle-half-stroke" style="color: var(--tg-blue);"></i>
-                </div>
-                <div class="tg-cell">
-                    <span>الإشعارات والأصوات</span>
-                    <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--tg-blue);">
                 </div>
             </div>
 
@@ -329,21 +293,12 @@
         </div>
     </div>
 
-    <!-- نافذة عرض الستوري الخاصة بك -->
+    <!-- نافذة عرض الستوري -->
     <div id="storyViewerModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; gap: 15px; padding: 20px;">
         <img id="storyViewerImg" src="" style="max-width: 100%; max-height: 75vh; border-radius: 12px; object-fit: contain;">
         <div style="display: flex; gap: 10px; width: 100%; max-width: 300px;">
             <button class="tg-btn" style="background: var(--tg-red);" onclick="deleteMyStory()">حذف القصة</button>
             <button class="tg-btn" style="background: rgba(128,128,128,0.3);" onclick="document.getElementById('storyViewerModal').style.display='none'">إغلاق</button>
-        </div>
-    </div>
-
-    <!-- نافذة عامة (للمحظورين والأرشيف) -->
-    <div id="genericModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000;">
-        <div class="tg-group" style="width: 85%; max-width: 320px; padding: 20px; background: var(--tg-bg);">
-            <h3 id="genericModalTitle" style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">العنوان</h3>
-            <div id="genericModalBody" style="max-height: 180px; overflow-y: auto; margin-bottom: 15px; font-size: 13px; color: var(--tg-secondary);">المحتوى هنا...</div>
-            <button class="tg-btn" style="padding: 6px;" onclick="document.getElementById('genericModal').style.display='none'">إغلاق</button>
         </div>
     </div>
 
@@ -435,7 +390,7 @@
             
             if(data.user) {
                 currentAuthUser = data.user;
-                await supabaseClient.from('profiles').insert([{ id: currentAuthUser.id, username, email, bio: 'مستخدم في سومركرام', full_name: username }]);
+                await supabaseClient.from('profiles').upsert([{ id: currentAuthUser.id, username, email, bio: 'مستخدم في سومركرام', full_name: username }]);
                 await fetchUserProfile();
                 await loadStories();
                 await loadChannels();
@@ -498,7 +453,7 @@
         const { error: uploadErr } = await supabaseClient.storage.from('chat-media').upload(fileName, file);
         if(uploadErr) return alert('خطأ في الرفع: ' + uploadErr.message);
 
-        const { data: { publicUrl } } = await supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+        const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
         
         await supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentAuthUser.id);
         alert('تم تحديث صورة البروفايل بنجاح!');
@@ -633,9 +588,7 @@
     function appendMessageToUI(msg) {
         const box = document.getElementById('chatMessagesBox');
         const isOutgoing = msg.sender_username === currentUserProfile.username;
-        let contentHtml = msg.type === 'image' ? `<img src="${msg.content}"/>` :
-                          msg.type === 'voice' ? `<audio controls src="${msg.content}" style="width: 160px; height: 32px;"></audio>` :
-                          msg.type === 'sticker' ? `<img src="${msg.content}" class="sticker-img"/>` : `<span>${msg.content}</span>`;
+        let contentHtml = msg.type === 'image' ? `<img src="${msg.content}"/>` : `<span>${msg.content}</span>`;
         box.innerHTML += `<div class="msg ${isOutgoing ? 'outgoing' : 'incoming'}">${contentHtml}</div>`;
         box.scrollTop = box.scrollHeight;
     }
@@ -657,50 +610,6 @@
         await supabaseClient.storage.from('chat-media').upload(fileName, file);
         const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
         await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: publicUrl, type: 'image' }]);
-    }
-
-    function toggleEmojiPicker() {
-        const p = document.getElementById('emojiPicker');
-        p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
-        document.getElementById('stickerPicker').style.display = 'none';
-    }
-
-    function toggleStickerPicker() {
-        const p = document.getElementById('stickerPicker');
-        p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
-        document.getElementById('emojiPicker').style.display = 'none';
-    }
-
-    function insertEmoji(em) { document.getElementById('messageInputText').value += em; }
-
-    async function sendSticker(url) {
-        if(isBlocked) return;
-        document.getElementById('stickerPicker').style.display = 'none';
-        await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: url, type: 'sticker' }]);
-    }
-
-    let mediaRecorder, audioChunks = [];
-    async function toggleVoiceRecording() {
-        if(isBlocked) return;
-        const btn = document.getElementById('recordBtn');
-        if(!mediaRecorder || mediaRecorder.state === 'inactive') {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const fileName = `${Date.now()}_voice.webm`;
-                    await supabaseClient.storage.from('chat-media').upload(fileName, audioBlob);
-                    const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
-                    await supabaseClient.from('messages').insert([{ sender_username: currentUserProfile.username, receiver_username: activeChatTarget, content: publicUrl, type: 'voice' }]);
-                    btn.style.color = 'var(--tg-secondary)';
-                };
-                mediaRecorder.start();
-                btn.style.color = '#ff3b30';
-            } catch (err) { alert('الميكروفون غير متاح'); }
-        } else { mediaRecorder.stop(); }
     }
 
     function triggerStoryUpload() {
@@ -781,7 +690,7 @@
 
     async function submitCreateChannel(chName) {
         const { error } = await supabaseClient.from('channels').insert([{ name: chName, creator_username: currentUserProfile.username }]);
-        if(error) return alert('هذه القناة موجودة مسبقاً، اختر اسماً آخر.');
+        if(error) return alert('هذه القناة موجودة مسبقاً أو حدث خطأ.');
         alert("✨ تم إنشاء القناة ونشرها بنجاح!");
         await loadChannels();
     }
@@ -798,18 +707,6 @@
             html += `<div class="tg-group" style="padding: 12px; margin-bottom: 8px;"><b>📢 قناة: ${ch.name}</b><br><span style="font-size: 12px; color: var(--tg-secondary);">أنشئت بواسطة @${ch.creator_username}</span></div>`;
         });
         container.innerHTML = html;
-    }
-
-    function openBlockedUsersModal() {
-        document.getElementById('genericModalTitle').innerText = "المستخدمون المحظورون";
-        document.getElementById('genericModalBody').innerHTML = "لا يوجد أي مستخدم محظور حالياً في قائمتك.";
-        document.getElementById('genericModal').style.display = 'flex';
-    }
-
-    function openArchiveModal() {
-        document.getElementById('genericModalTitle').innerText = "أرشيف المحادثات";
-        document.getElementById('genericModalBody').innerHTML = "ليس لديك أي محادثات مؤرشفة حالياً.";
-        document.getElementById('genericModal').style.display = 'flex';
     }
 </script>
 
