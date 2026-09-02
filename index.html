@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سومركرام — SomerGram Real Pro</title>
+    <title>سومركرام — SomerGram Ultimate Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -131,7 +131,7 @@
 
 <div class="iphone-container">
     
-    <!-- شاشة التسجيل الحقيقي -->
+    <!-- شاشة التسجيل -->
     <div class="app-screen active" id="screenAuth" style="justify-content: center; padding: 25px; height: 100vh;">
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="font-size: 50px; color: var(--tg-blue); margin-bottom: 10px;"><i class="fa-brands fa-telegram"></i></div>
@@ -139,7 +139,7 @@
             <p style="font-size: 13px; color: var(--tg-secondary);">التطبيق الأقوى للمراسلة الفورية</p>
         </div>
         <div class="tg-group" style="padding: 15px; gap: 12px;">
-            <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (Username)..."></div>
+            <div class="input-box"><i class="fa-solid fa-at"></i><input type="text" id="authUsername" placeholder="اسم المستخدم (إنجليزي فقط مثل: ali)..."></div>
             <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="authEmail" placeholder="البريد الإلكتروني الحقيقي..."></div>
             <div class="input-box"><i class="fa-solid fa-lock"></i><input type="password" id="authPassword" placeholder="كلمة المرور..."></div>
             <button class="tg-btn" onclick="handleEmailAuth('signup')">إنشاء حساب حقيقي جديد</button>
@@ -154,9 +154,9 @@
             <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 13px; background: rgba(128,128,128,0.2); color: var(--tg-text);" onclick="openContactsModal()"><i class="fa-solid fa-address-book"></i> جهات الاتصال</button>
         </div>
         
-        <!-- شريط الستوريات الفعلي -->
+        <!-- شريط الستوريات العلوي -->
         <div class="stories-bar" id="storiesBar">
-            <div class="story-item" onclick="triggerStoryUpload()">
+            <div class="story-item" onclick="handleMyStoryClick()">
                 <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
                 <span class="story-name">قصتك</span>
             </div>
@@ -166,7 +166,7 @@
         <div class="content-body">
             <div class="input-box">
                 <i class="fa-solid fa-magnifying-glass" style="color: var(--tg-secondary);"></i>
-                <input type="text" id="searchFriendInput" placeholder="بحث عن يوزر صديق..." oninput="searchRealUser(this.value)">
+                <input type="text" id="searchFriendInput" placeholder="بحث عن يوزر صديق (إنجليزي)..." oninput="searchRealUser(this.value)">
             </div>
 
             <div id="friendsListView" style="display: flex; flex-direction: column; gap: 8px;">
@@ -238,38 +238,49 @@
         </div>
     </div>
 
-    <!-- شاشة الملف الشخصي الحقيقية والمحدثة فورياً -->
+    <!-- شاشة الملف الشخصي (وضع القراءة + زر التعديل المنفصل) -->
     <div class="app-screen" id="screenProfile">
-        <div class="nav-bar"><h1 class="nav-title">الملف الشخصي</h1></div>
+        <div class="nav-bar">
+            <h1 class="nav-title">الملف الشخصي</h1>
+            <button class="tg-btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleProfileEditMode()" id="profileEditToggleBtn">تعديل الملف</button>
+        </div>
         <div class="content-body">
-            <div class="tg-group" style="padding: 20px; align-items: center; text-align: center;">
-                <input type="file" id="profileAvatarInput" accept="image/*" style="display: none;" onchange="updateAvatarImage(this)">
-                <div id="profileAvatarBox" onclick="document.getElementById('profileAvatarInput').click()" style="width: 75px; height: 75px; border-radius: 50%; background: var(--tg-blue); display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; margin-bottom: 8px; cursor: pointer; overflow: hidden; background-size: cover; background-position: center;">
-                    <i class="fa-solid fa-user" id="defaultAvatarIcon"></i>
+            <!-- وضع العرض (Read-Only) -->
+            <div class="tg-group" id="profileViewMode" style="padding: 25px; align-items: center; text-align: center; gap: 10px;">
+                <div id="profileViewAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: var(--tg-blue); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; background-size: cover; background-position: center;">
+                    <i class="fa-solid fa-user"></i>
                 </div>
-                <h2 id="profileUsernameDisplay" style="font-size: 17px; font-weight: 700;">@username</h2>
-                <p id="profileBioDisplay" style="font-size: 12px; color: var(--tg-secondary); margin-top: 2px;">لا توجد نبذة...</p>
+                <h2 id="viewProfileName" style="font-size: 18px; font-weight: 800;">الاسم الكامل</h2>
+                <span id="viewProfileUsername" style="font-size: 14px; color: var(--tg-blue);">@username</span>
+                <p id="viewProfileBio" style="font-size: 13px; color: var(--tg-secondary);">لا توجد نبذة شخصية...</p>
             </div>
 
-            <div class="tg-group">
-                <div class="tg-cell" style="flex-direction: column; align-items: stretch; gap: 8px;">
-                    <span style="font-size: 13px; color: var(--tg-secondary);">تعديل البيانات واليوزر والصورة</span>
-                    <input type="text" id="editUsernameInput" class="input-box" placeholder="اليوزر الجديد...">
-                    <input type="text" id="editNameInput" class="input-box" placeholder="الاسم الكامل...">
-                    <input type="text" id="editBioInput" class="input-box" placeholder="النبذة الشخصية (Bio)...">
-                    <button class="tg-btn" style="padding: 10px; font-size: 14px;" onclick="updateUserProfile()">حفظ التعديلات الفورية</button>
-                </div>
+            <!-- وضع التعديل (Hidden by default) -->
+            <div class="tg-group" id="profileEditMode" style="padding: 20px; display: none; gap: 12px;">
+                <input type="file" id="profileAvatarInput" accept="image/*" style="display: none;" onchange="updateAvatarImage(this)">
+                <button class="tg-btn" style="background: rgba(0,122,255,0.1); color: var(--tg-blue);" onclick="document.getElementById('profileAvatarInput').click()">تغيير الصورة الشخصية</button>
+                
+                <div style="font-size: 12px; color: var(--tg-secondary);">اسم المستخدم (English Only):</div>
+                <input type="text" id="editUsernameInput" class="input-box" placeholder="Username (English)...">
+                
+                <div style="font-size: 12px; color: var(--tg-secondary);">الاسم الكامل (عربي / English):</div>
+                <input type="text" id="editNameInput" class="input-box" placeholder="الاسم الكامل...">
+                
+                <div style="font-size: 12px; color: var(--tg-secondary);">النبذة الشخصية (Bio):</div>
+                <input type="text" id="editBioInput" class="input-box" placeholder="نبذتك...">
+                
+                <button class="tg-btn" onclick="updateUserProfile()">حفظ التعديلات في سومركرام</button>
             </div>
         </div>
     </div>
 
-    <!-- شاشة الإعدادات المتكاملة -->
+    <!-- شاشة الإعدادات المتكاملة الأصلية -->
     <div class="app-screen" id="screenSettings">
         <div class="nav-bar"><h1 class="nav-title">الإعدادات</h1></div>
         <div class="content-body">
-            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px;">الحساب والأمان</div>
+            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px;">إدارة الحساب</div>
             <div class="tg-group">
-                <div class="tg-cell tg-cell-action" onclick="alert('رقم الهاتف مرتبط بالحساب الآمن.')">
+                <div class="tg-cell tg-cell-action" onclick="alert('حسابك مؤمن برقم هاتف موثق.')">
                     <span>رقم الهاتـف</span>
                     <span style="color: var(--tg-secondary); font-size: 14px;">+964 ••• ••••</span>
                 </div>
@@ -279,12 +290,24 @@
                 </div>
             </div>
 
-            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px; margin-top: 5px;">الخصوصية والمظهر</div>
+            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px; margin-top: 5px;">الخصوصية والأمان</div>
             <div class="tg-group">
                 <div class="tg-cell">
                     <span>حالة الظهور (آخر ظهور)</span>
                     <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--tg-blue);">
                 </div>
+                <div class="tg-cell tg-cell-action" onclick="openBlockedUsersModal()">
+                    <span>المستخدمون المحظورون</span>
+                    <i class="fa-solid fa-ban" style="color: var(--tg-red);"></i>
+                </div>
+                <div class="tg-cell tg-cell-action" onclick="openArchiveModal()">
+                    <span>أرشيف المحادثات</span>
+                    <i class="fa-solid fa-box-archive" style="color: var(--tg-blue);"></i>
+                </div>
+            </div>
+
+            <div style="font-size: 12px; color: var(--tg-secondary); padding-right: 5px; margin-top: 5px;">المظهر والإشعارات</div>
+            <div class="tg-group">
                 <div class="tg-cell tg-cell-action" onclick="toggleTheme()">
                     <span>الوضع الليلي / النهاري</span>
                     <i class="fa-solid fa-circle-half-stroke" style="color: var(--tg-blue);"></i>
@@ -311,6 +334,24 @@
                 <span style="font-size: 13px; color: var(--tg-secondary);">جاري جلب جهات الاتصال...</span>
             </div>
             <button class="tg-btn" style="padding: 6px;" onclick="document.getElementById('contactsModal').style.display='none'">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- نافذة عرض الستوري الخاصة بك -->
+    <div id="storyViewerModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; gap: 15px; padding: 20px;">
+        <img id="storyViewerImg" src="" style="max-width: 100%; max-height: 75vh; border-radius: 12px; object-fit: contain;">
+        <div style="display: flex; gap: 10px; width: 100%; max-width: 300px;">
+            <button class="tg-btn" style="background: var(--tg-red);" onclick="deleteMyStory()">حذف القصة</button>
+            <button class="tg-btn" style="background: rgba(128,128,128,0.3);" onclick="document.getElementById('storyViewerModal').style.display='none'">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- نافذة المستخدمين المحظورين والأرشيف -->
+    <div id="genericModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000;">
+        <div class="tg-group" style="width: 85%; max-width: 320px; padding: 20px; background: var(--tg-bg);">
+            <h3 id="genericModalTitle" style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">العنوان</h3>
+            <div id="genericModalBody" style="max-height: 180px; overflow-y: auto; margin-bottom: 15px; font-size: 13px; color: var(--tg-secondary);">المحتوى هنا...</div>
+            <button class="tg-btn" style="padding: 6px;" onclick="document.getElementById('genericModal').style.display='none'">إغلاق</button>
         </div>
     </div>
 
@@ -353,7 +394,12 @@
             currentUserProfile = data;
             document.getElementById('profileUsernameDisplay').innerText = "@" + data.username;
             document.getElementById('settingsUsernameVal').innerText = "@" + data.username;
-            document.getElementById('profileBioDisplay').innerText = data.bio || "لا توجد نبذة...";
+            
+            // تحديث بيانات وضع العرض للملف الشخصي
+            document.getElementById('viewProfileName').innerText = data.full_name || "بدون اسم";
+            document.getElementById('viewProfileUsername').innerText = "@" + data.username;
+            document.getElementById('viewProfileBio').innerText = data.bio || "لا توجد نبذة شخصية...";
+
             document.getElementById('editBioInput').value = data.bio || "";
             document.getElementById('editNameInput').value = data.full_name || "";
             document.getElementById('editUsernameInput').value = data.username || "";
@@ -362,19 +408,45 @@
                 const box = document.getElementById('profileAvatarBox');
                 box.style.backgroundImage = `url(${data.avatar_url})`;
                 document.getElementById('defaultAvatarIcon').style.display = 'none';
+
+                const viewAvatar = document.getElementById('profileViewAvatar');
+                viewAvatar.style.backgroundImage = `url(${data.avatar_url})`;
+                viewAvatar.innerHTML = '';
             }
+        }
+    }
+
+    // تبديل وضع عرض الملف الشخصي إلى وضع التعديل
+    function toggleProfileEditMode() {
+        const editBox = document.getElementById('profileEditMode');
+        const viewBox = document.getElementById('profileViewMode');
+        const btn = document.getElementById('profileEditToggleBtn');
+
+        if(editBox.style.display === 'none') {
+            editBox.style.display = 'flex';
+            viewBox.style.display = 'none';
+            btn.innerText = "إلغاء التعديل";
+        } else {
+            editBox.style.display = 'none';
+            viewBox.style.display = 'flex';
+            btn.innerText = "تعديل الملف";
         }
     }
 
     async function handleEmailAuth(type) {
         const email = document.getElementById('authEmail').value.trim();
         const password = document.getElementById('authPassword').value.trim();
-        const username = document.getElementById('authUsername').value.trim().replace('@', '');
+        let username = document.getElementById('authUsername').value.trim().replace('@', '');
         
+        // التحقق من أن اليوزر إنجليزي فقط
+        const englishRegex = /^[A-Za-z0-9_]+$/;
+        if(type === 'signup' && !englishRegex.test(username)) {
+            return alert('❌ عذراً، اسم المستخدم (Username) يجب أن يكون باللغة الإنجليزية والأرقام فقط!');
+        }
+
         if(!email || !password) return alert('الرجاء إدخال البريد وكلمة المرور');
 
         if(type === 'signup') {
-            if(!username) return alert('أدخل يوزراً صالحاً');
             const { data: existingUser } = await supabaseClient.from('profiles').select('username').eq('username', username).single();
             if(existingUser) return alert('هذا اليوزر مستخدم بالفعل');
 
@@ -383,7 +455,7 @@
             
             currentAuthUser = data.user;
             if(currentAuthUser) {
-                await supabaseClient.from('profiles').insert([{ id: currentAuthUser.id, username, email, bio: 'مستخدم في سومركرام' }]);
+                await supabaseClient.from('profiles').insert([{ id: currentAuthUser.id, username, email, bio: 'مستخدم في سومركرام', full_name: username }]);
             }
             alert('تم إنشاء الحساب بنجاح في سومركرام!');
         } else {
@@ -399,9 +471,12 @@
     async function updateUserProfile() {
         const newBio = document.getElementById('editBioInput').value.trim();
         const newName = document.getElementById('editNameInput').value.trim();
-        const newUsername = document.getElementById('editUsernameInput').value.trim().replace('@', '');
+        let newUsername = document.getElementById('editUsernameInput').value.trim().replace('@', '');
         
-        if(!newUsername) return alert('اليوزر لا يمكن أن يكون فارغاً');
+        const englishRegex = /^[A-Za-z0-9_]+$/;
+        if(!englishRegex.test(newUsername)) {
+            return alert('❌ اسم المستخدم (Username) يجب أن يكون باللغة الإنجليزية والأرقام فقط!');
+        }
 
         if(newUsername !== currentUserProfile.username) {
             const { data: existingUser } = await supabaseClient.from('profiles').select('username').eq('username', newUsername).single();
@@ -412,6 +487,7 @@
         if(error) return alert('خطأ في التحديث: ' + error.message);
 
         alert('✨ تم حفظ التعديلات في سومركرام بنجاح!');
+        toggleProfileEditMode();
         await fetchUserProfile();
     }
 
@@ -422,12 +498,9 @@
         const { error: uploadErr } = await supabaseClient.storage.from('chat-media').upload(fileName, file);
         if(uploadErr) return alert('خطأ في الرفع: ' + uploadErr.message);
 
-        const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
+        const { data: { publicUrl } } = await supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
         
         await supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentAuthUser.id);
-        const box = document.getElementById('profileAvatarBox');
-        box.style.backgroundImage = `url(${publicUrl})`;
-        document.getElementById('defaultAvatarIcon').style.display = 'none';
         alert('تم تحديث صورة البروفايل بنجاح!');
         await fetchUserProfile();
     }
@@ -630,6 +703,7 @@
         } else { mediaRecorder.stop(); }
     }
 
+    // إدارة ونشر وعرض الستوريات الحقيقية
     function triggerStoryUpload() {
         document.getElementById('storyFileInput').click();
     }
@@ -639,39 +713,52 @@
         if(!file) return;
         const fileName = `story_${currentAuthUser.id}_${Date.now()}`;
         const { error } = await supabaseClient.storage.from('chat-media').upload(fileName, file);
-        if(error) return alert('خطأ في نشر القصة');
+        if(error) return alert('خطأ في نشر القصة: ' + error.message);
 
         const { data: { publicUrl } } = supabaseClient.storage.from('chat-media').getPublicUrl(fileName);
         
         await supabaseClient.from('profiles').update({ story_url: publicUrl }).eq('id', currentAuthUser.id);
         
-        const thumb = document.getElementById('myStoryThumb');
-        thumb.style.backgroundImage = `url(${publicUrl})`;
-        thumb.style.backgroundSize = 'cover';
-        thumb.innerHTML = '';
         alert("✨ تم نشر قصتك (Story) بنجاح في سومركرام!");
+        await fetchUserProfile();
+        await loadStories();
+    }
+
+    function handleMyStoryClick() {
+        if(currentUserProfile && currentUserProfile.story_url) {
+            document.getElementById('storyViewerImg').src = currentUserProfile.story_url;
+            document.getElementById('storyViewerModal').style.display = 'flex';
+        } else {
+            triggerStoryUpload();
+        }
+    }
+
+    async function deleteMyStory() {
+        await supabaseClient.from('profiles').update({ story_url: null }).eq('id', currentAuthUser.id);
+        document.getElementById('storyViewerModal').style.display = 'none';
+        alert('تم حذف قصتك بنجاح');
+        await fetchUserProfile();
         await loadStories();
     }
 
     async function loadStories() {
         const { data } = await supabaseClient.from('profiles').select('username, story_url, avatar_url').not('story_url', 'is', null);
         const bar = document.getElementById('storiesBar');
+        
+        let myThumbHtml = `<i class="fa-solid fa-plus"></i>`;
+        if(currentUserProfile && currentUserProfile.story_url) {
+            myThumbHtml = '';
+            document.getElementById('myStoryThumb').style.backgroundImage = `url(${currentUserProfile.story_url})`;
+            document.getElementById('myStoryThumb').style.backgroundSize = 'cover';
+        } else {
+            document.getElementById('myStoryThumb').style.backgroundImage = 'none';
+        }
+
         let html = `
-            <div class="story-item" onclick="triggerStoryUpload()">
-                <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb"><i class="fa-solid fa-plus"></i></div></div>
+            <div class="story-item" onclick="handleMyStoryClick()">
+                <div class="story-ring" style="background: var(--tg-secondary);"><div class="story-img" id="myStoryThumb">${myThumbHtml}</div></div>
                 <span class="story-name">قصتك</span>
             </div>`;
-        
-        if(currentUserProfile && currentUserProfile.story_url) {
-            setTimeout(() => {
-                const thumb = document.getElementById('myStoryThumb');
-                if(thumb) {
-                    thumb.style.backgroundImage = `url(${currentUserProfile.story_url})`;
-                    thumb.style.backgroundSize = 'cover';
-                    thumb.innerHTML = '';
-                }
-            }, 100);
-        }
 
         if(data) {
             data.forEach(user => {
@@ -701,6 +788,18 @@
         document.getElementById('newChannelNameInput').value = '';
         document.getElementById('channelCreateBox').style.display = 'none';
         alert("تم إنشاء القناة بنجاح!");
+    }
+
+    function openBlockedUsersModal() {
+        document.getElementById('genericModalTitle').innerText = "المستخدمون المحظورون";
+        document.getElementById('genericModalBody').innerHTML = "لا يوجد أي مستخدم محظور حالياً في قائمتك.";
+        document.getElementById('genericModal').style.display = 'flex';
+    }
+
+    function openArchiveModal() {
+        document.getElementById('genericModalTitle').innerText = "أرشيف المحادثات";
+        document.getElementById('genericModalBody').innerHTML = "ليس لديك أي محادثات مؤرشفة حالياً.";
+        document.getElementById('genericModal').style.display = 'flex';
     }
 </script>
 
